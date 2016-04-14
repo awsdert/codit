@@ -1,0 +1,4 @@
+// the configured options and settings for Codit
+#define CODIT_VERSION_MAJOR @Codit_VERSION_MAJOR@
+#define CODIT_VERSION_MINOR @Codit_VERSION_MINOR@
+#define USE_IUP @Use_IUP@
