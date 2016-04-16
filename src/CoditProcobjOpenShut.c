@@ -1,9 +1,9 @@
 #include "CoditProcobj.h"
 
-PPROCESS CoditProcobjOpen( int access, int pid, int *syserr )
+HPROCESS CoditProcobjOpen( int access, int pid, int *syserr )
 {
 	int e = 0;
-	PPROCESS hPt =
+	HPROCESS hPt =
 #ifdef _WIN32
 		OpenProcess( access, FALSE, pid );
 #else
@@ -22,7 +22,7 @@ done:
 	return hProc;
 }
 
-PPROCESS CoditProcobjShut( PPROCESS hPt )
+HPROCESS CoditProcobjShut( HPPROCESS hPt )
 {
 #ifdef _WIN32
 	CloseHandle( hPt );

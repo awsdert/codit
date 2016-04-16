@@ -1,4 +1,5 @@
 #pragma once
+#include <stddef.h>
 #ifdef _WIN32
 #include <windows.h>
 #define MREQUEST GlobalReAlloc

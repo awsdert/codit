@@ -16,7 +16,39 @@ int main ( int argc, char *argv[] )
 	if ( CoditProclstPrepAPI() == FALSE )
 		return EXIT_FAILURE;
 	listAllProc();
+	if ( CoditFilelstPrepAPI() == FALSE )
+		return EXIT_FAILURE;
+	listAllFile();
 	return EXIT_SUCCESS;
+}
+
+void listAllFile( void )
+{
+	char *name = NULL;
+	char *path =
+#ifdef _WIN32
+		GetCurrentWorkingDirectory();
+#else
+		getcwd();
+#endif
+	int leng = 0;
+	HFILELST hfl = CoditFilelstOpen( path );
+	FILEENT fe = {0};
+	if ( CoditFilelst1st( hfl, &fe ) == FALSE )
+		goto failList;
+	do
+	{
+		CoditFileentName( &fe, &name, &leng );
+#if USE_IUP
+		IupMessageBox( "File Entry", name );
+#else
+		fputs(name, stdout);
+#endif
+	}
+	while ( CoditFilelstNxt( hfl, &fe ) == TRUE );
+failList:
+	// Safest way to force cleanup
+	while ((hfl = CoditFilelstShut( hfl ));
 }
 
 void listAllProc( void )
