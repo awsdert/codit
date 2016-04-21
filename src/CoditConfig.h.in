@@ -1,4 +1,4 @@
-// the configured options and settings for Codit
-#define CODIT_VERSION_MAJOR @Codit_VERSION_MAJOR@
-#define CODIT_VERSION_MINOR @Codit_VERSION_MINOR@
-#define USE_IUP @Use_IUP@
+// The configured options and settings for Codit
+#define CODIT_VERSION_MAJOR @MAKE_CODIT_VERSION_MAJOR@
+#define CODIT_VERSION_MINOR @MAKE_CODIT_VERSION_MINOR@
+#define USE_ALLEGRO @MAKE_USE_ALLEGRO@

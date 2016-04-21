@@ -19,6 +19,9 @@ HFILEOBJ CoditOpenFileobjEx(
 	if ( !(attr & FILEOBJ_ATTR_NOBUFF | FILEOBJ_ATTR_DIRECT) &&
 		!( hfo->buf = malloc( BUFSIZ)) )
 		goto fail;
+	/* Mimic Windows an set this by default,
+	rare that a user app would need otherwise and
+	they can just use _open directly when they do */
 	int pmode = _S_IREAD;
 	if ( access & 0222 )
 		pmode |= _S_IWRITE;
@@ -30,14 +33,19 @@ HFILEOBJ CoditOpenFileobjEx(
 	fail:
 		free( hfo );
 		hfo = NULL;
-		goto done;
 	}
 #endif
 done:
 	return hfo;
 }
 
-HFILEOBJ CoditShutFileobj( HFILEOBJ hfo )
+HFILEOBJ CoditFileobjOpen( const char const *path, int access )
+{
+	return CoditFileobjOpenEx( path, access, 0, NULL,
+		FILEOBJ_MKIFNONE, FILEOBJ_ATTR_NORMAL, NULL );
+}
+
+HFILEOBJ CoditFileobjShut( HFILEOBJ hfo )
 {
 #ifdef _WIN32
 	CloseHandle( hfo );

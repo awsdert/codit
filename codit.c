@@ -1,3 +1,5 @@
+#include "CoditProclst.h"
+/*
 #include "CoditFileobjOpenShut.c"
 #include "CoditFileobjPutGet.c"
 
@@ -16,3 +18,8 @@
 #include "CoditProclstNxt.c"
 #include "CoditProcentName.c"
 #include "CoditProcentPid.c"
+*/
+int main( int argc, char *argv[] )
+{
+	return 0;
+}
