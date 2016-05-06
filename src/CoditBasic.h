@@ -1,5 +1,5 @@
 #pragma once
-#include <CoditConfig.h>
+#include <CoditBuild.h>
 #include <stddef.h>
 #ifdef _WIN32
 #include <windows.h>

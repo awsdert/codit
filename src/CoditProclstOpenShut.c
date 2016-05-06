@@ -1,13 +1,12 @@
 #include "CoditProclst.h"
 #ifdef _WIN32
-CreateTH32SnapShot_t CreateTH32SnapShot = NULL;
 HPROCLST CoditProclstOpen( int ppid )
 {
 	return CreateTH32Snapshot( TH32CS_SNAPPROCESS, ppid );
 }
 HPROCLST CoditProclstShut( HPROCLST hpl )
 {
-	if ( CloseToolhelp32Snapshot( hpl ) == TRUE )
+	if ( CloseTH32Snapshot( hpl ) == TRUE )
 		return NULL;
 	return hpl;
 }

@@ -1,98 +1,75 @@
-#Check if hosted by 64bit windows or 32bit alternative
-ifeq ($(ProgramW6432), "")
-	SYSBIT:=32
-else
-	SYSBIT:=64
-endif
-
-# Check if hosted by windows or linux variant
-ifdef ProgramFiles
-	SYSTEM:=windows
-	# Specifies 32/64bit compiler to use
-	THEBIT?=$(SYSBIT)
-	THE_CC?=mingw
-else
-	SYSTEM?=linux
-	# Specifies nothing so override
-	THEBIT:=
-	THE_CC?=gcc
-endif
-
-#Get compiler details
-include host/$(SYSTEM)/$(THE_CC)$(THEBIT).mk
-
-ifdef DEBUG
-	DBG:=d_
-	FLG:=$(Fgdb)
-else
-	DBG:=
-	FLG:=$(FO)
-endif
-
-TARSYS?=$(SYSTEM)
-TARBIT?=$(SYSBIT)
-
-# Check what kind of executable will be generated
-ifeq ($(TARSYS),windows)
-	TAREXE:=.exe
-	TARDLL:=.dll
-	TARDIR:=win$(TARBIT)
-	TARFLG:=$(FD)_WIN$(TARBIT)
-else
-	TAREXE:=
-	TARDLL:=.so
-	TARDIR:=linux
-	TARFLG:=$(FD)__linux__
-endif
-
 #Directories
 TOPDIR?=
-SRCDIR:=$(TOPDIR)src
-OBJDIR:=$(TOPDIR)obj
-OUTDIR:=$(TOPDIR)build
-PRJOUT:=$(OUTDIR)/$(TARDIR)
-PRJOBJ:=$(OBJDIR)/$(TARDIR)
-PRJINC:=$(FI) $(CC_INC) $(FI) $(SRCDIR)
-PRJBIN=$(FL) $(CC_LIB) $(FL) $(PRJOUT)
-PRJLIB=$(FL) $(CC_LIB)
-B:=$(PRJOUT)/$(DBG)
-O:=$(PRJOBJ)/$(DBG)
-SOURCES:=$(wildcard $(SRCDIR)/*.c)
-OBJECTS:=$(patsubst %.c,$(O)%.o,$(SOURCES))
-#File handling
-FILE_C:=$(wildcard $(SRCDIR)/coditfile*.c)
-FILE_O:=$(patsubst %.c,$(O)%.o,$(FILE_C))
-#Process handling
-PROC_C:=$(wildcard $(SRCDIR)/coditproc*.c)
-PROC_O:=$(PROC_C:.c=.o)
+include $(TOPDIR)directories.mk
+
 #Compiler Stuff
-CFLAGS:=$(PRJINC) $(PRJLIB) $(FWall) $(TARFLG) $(FLG)
+CFLAGS:=$(PRJINC) $(PRJLIB) $(FWall) $(Fstd_c99) $(TARFLG) $(FLG)
 
-all: clean help test binary
+#$(info HERE=$(HERE))
+$(info CURDIR=$(CURDIR))
+$(info WKSDIR=$(WKSDIR))
+$(info host/$(SYSTEM)/$(THE_CC)$(THEBIT).mk) 
+$(info $(TARSYS) $(TARBIT)bit compile)
+#$(info B=$(B))
+#$(info O=$(O))
+#$(info SOURCES=$(SOURCES))
+#$(info OBJECTS=$(OBJECTS))
+#$(error Build cancelled by force)
 
-objects: help $(OBJECTS)
+export PATH:=$(PATH);$(CC_BIN)
 
-help:
-	@echo host/${SYSTEM}/${THE_CC}${THEBIT}.mk 
-	@echo ${TARSYS} ${TARBIT}bit compile
-	@echo B=${B}
+rebuild: clean test dobuild
+
+objects: directories $(OBJECTS) CoditConfig.h
+
+directories: $(DEPDIR)
 
 test: objects $(O)CoditTest.o
 	${CC} ${PRJBIN} ${Fc} $< ${Fo} ${B}CoditTest${TAREXE}
 
-binary: objects $(O)codit.o
+dobuild: objects $(O)codit.o
 	${CC} ${Fc} $< ${Fo} ${B}codit${TAREXE}
+	
+install: dobuild
+	$(error Installation not yet supported)
+	$(INSTALL_CODIT)
+	$(INSTALL_ICONS)
 
 clean:
-	${RM} ${OBJDIR}/win32/* ${OUTDIR}/win32/*
-	${RM} ${OBJDIR}/win64/* ${OUTDIR}/win64/*
-	${RM} ${OBJDIR}/linux/* ${OUTDIR}/linux/*
+	${RM} ${OBJDIR}* ${OUTDIR}*
 
 #Mingw64 absolute paths, %MGW64% is a manually created enviroment variable on
 #windows, an alternative variable to make is %MAKE% which just an absolute path
 #to the default make.exe (I recommend setting it to the 1st path below)
+#%MAKE%
 #%MGW64%\bin\mingw32-make.exe
 #c:\tools\mingw64\bin\mingw32-make.exe
 
+src/CoditBuild.c: .git/logs/HEAD
+	"#include \"CoditBuild.h\"" > $@
+	"const long CODIT_MAJOR = ${TARGET_MAJOR};" >> $@
+	"const long CODIT_MINOR = ${TARGET_MINOR};" >> $@
+	while read -r $<; do echo read
+	"const long CODIT_HDATE = 0;" >> $@
+	"const long CODIT_HTIME = 0;" >> $@
+	"const long CODIT_CDATE = 0;" >> $@
+	"const long CODIT_CTIME = 0;" >> $@
+
+CoditConfig.h:
+	"#define CODIT_MAJOR ${COMPILE_MAJOR}"	>> "${O}$@"
+	"#define CODIT_MINOR ${SYSTEM_NAME}}"	>> "${O}$@"
+	"#define CODIT_BUILD ${COMPILE_BUILD}"	>> "${O}$@"
+	"#define SYSTEM_NAME ${COMPILE_MAJOR}"	>> "${O}$@"
+	"#define SYSTEM_VERS ${SYSTEM_NAME}}"	>> "${O}$@"
+
+$(O)codit.o: codit.c
+	${CC} ${CFLAGS} ${Fc} "${TOPDIR}$<" ${Fo} "$@"
+
+$(O)CoditTest.o: CoditTest.c
+	${CC} ${CFLAGS} ${Fc} "${TOPDIR}$<" ${Fo} "$@"
+
 $(O)%.o: %.c
-	${CC} ${CFLAGS} ${Fc} $< ${Fo} $@
+	${CC} ${CFLAGS} ${Fc} "${TOPDIR}$<" ${Fo} "$@"
+	
+$(DEPDIR):
+	$(MKDIR) "${DEPDIR}"

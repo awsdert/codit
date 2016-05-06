@@ -1,5 +1,8 @@
 // Place your settings in this file to overwrite default and user settings.
 {
 	"editor.rulers": [80],
-	"editor.insertSpaces": false
+	"editor.insertSpaces": false,
+	"files.associations": {
+		"*.mk" : "makefile"
+	}
 }

@@ -1,4 +1,4 @@
-#inclue "CoditProcobj.h"
+#include "CoditProclst.h"
 BOOL CoditProceentName( PPROCENT ppe, char **name, int *leng )
 {
 	char *n = name ? *name : NULL, *exe = NULL;

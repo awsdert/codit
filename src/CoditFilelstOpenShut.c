@@ -16,7 +16,7 @@ HFILELST CoditFilelstOpen( const char const *path )
 HFILELST CoditFilelstShut( HFILELST hfl )
 {
 #ifdef _WIN32
-	HeapFree( GetProcessHeap(), hfl );
+	HeapFree( GetProcessHeap(), 0, hfl );
 #else
 	free( hfl );
 #endif

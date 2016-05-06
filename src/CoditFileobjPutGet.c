@@ -1,12 +1,10 @@
-#include "fileobj.h"
-
+#include "CoditFileobj.h"
 
 fsize_t CoditFileobjPut(
 	HFILEOBJ hFt,
 	uintptr_t addr,
 	void const *buff,
-	fsize_t size,
-	int *syserr )
+	fsize_t size )
 {
 	fsize_t b = 0;
 #ifdef _WIN32
@@ -22,8 +20,7 @@ fsize_t CoditFileobjGet(
 	HFILEOBJ hFt,
 	uintptr_t addr,
 	void *buff,
-	fsize_t size,
-	int *syserr )
+	fsize_t size )
 {
 	fsize_t b = 0;
 #ifdef _WIN32

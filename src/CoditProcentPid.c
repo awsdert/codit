@@ -1,10 +1,9 @@
-#include "CoditProcobj.h"
+#include "CoditProclst.h"
 int CoditProcentPid( PPROCENT ppe )
 {
 #ifdef _WIN32
-	return ppe->pid;
+	return ppe->th32ProcessID;
 #else
-#error CoditProcentPid() does nothing!
-	return -1;
+	return ppe->stat.pid;
 #endif
 }

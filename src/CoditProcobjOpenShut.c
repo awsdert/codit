@@ -1,34 +1,27 @@
 #include "CoditProcobj.h"
 
-HPROCESS CoditProcobjOpen( int access, int pid, int *syserr )
+HPROCOBJ CoditProcobjOpen( int access, int pid )
 {
-	int e = 0;
-	HPROCESS hPt =
+	HPROCOBJ hpo =
 #ifdef _WIN32
 		OpenProcess( access, FALSE, pid );
 #else
 		calloc( sizeof( PROCESS ), 1 );
-	if ( !hPt )
-		goto done;
-	hPt->pid = pid;
-	hPt->mem = _open( path, _O_BINARY | access, _S_RDWR );
+	if ( !hpo )
+		return NULL;
+	hpo->pid = pid;
+	hpo->mem = _open( path, _O_BINARY | access, _S_RDWR );
 #endif
-done:
-	if ( syserr )
-	{
-		*syserr = SysGetFault;
-		SysSetFault(0);
-	}
-	return hProc;
+	return hpo;
 }
 
-HPROCESS CoditProcobjShut( HPPROCESS hPt )
+HPROCOBJ CoditProcobjShut( HPROCOBJ hpo )
 {
 #ifdef _WIN32
-	CloseHandle( hPt );
+	CloseHandle( hpo );
 #else
-	_close( hPt->mem );
-	free( hPt );
+	_close( hpo->mem );
+	free( hpo );
 #endif
 	return NULL;
 }

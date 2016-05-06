@@ -1,11 +1,24 @@
 #include "CoditProcobj.h"
 
-PPROCESS CoditProcobjRun( char *path, char *options )
+HPROCOBJ CoditProcobjRun( char *path, char *options )
 {
-	PPROCESS hPt =
+	
 #ifdef _WIN32
-		CreateProcess( path, options );
+		NULL;
+	PROCESS_INFORMATION pi = {0};
+	//pi.dwSize = sizeof(PROCESS_INFORMATION);
+	if ( CreateProcessA( path, options, NULL, NULL, FALSE,
+			0, // TODO: provide flags support
+			NULL, NULL, NULL, &pi ) == TRUE )
+		return pi.hProcess;
+	return NULL;
 #else
-		malloc( sizeof(PROCESS) );
+	HPROCOBJ hpo = calloc( sizeof(PROCOBJ), 1 );
+	if ( !hpo )
+		return NULL;
+#error Linux/OSX version of CoditProcobjRun does not try and execute path
+	free( hpo );
+	hpo = NULL;
+	return hpo;
 #endif
 }

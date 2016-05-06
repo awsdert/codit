@@ -8,10 +8,9 @@ HFILEOBJ CoditOpenFileobjEx(
 	int attr,
 	HFILEOBJ template )
 {
-	int e = 0;
 	HFILEOBJ hfo =
 #ifdef _WIN32
-		CreateFileA( path, access, share, fattr, openas, attr, template );
+		CreateFileA( path, access, share, oss, openas, attr, template );
 #else
 		calloc( sizeof( FILEOBJ ), 1 );
 	if ( !hfo )
@@ -35,7 +34,6 @@ HFILEOBJ CoditOpenFileobjEx(
 		hfo = NULL;
 	}
 #endif
-done:
 	return hfo;
 }
 
