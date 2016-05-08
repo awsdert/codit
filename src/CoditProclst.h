@@ -27,14 +27,17 @@ typedef struct _PROCSTAT {
 	int tpgid;
 	unsigned int flags;
 } PROCSTAT, *PPROCSTAT;
-BOOL coditProcobjStat( HPROCOBJ hProc, PROCSTAT *stat );
-void coditProcobjStatFree( PROCSTAT *stat );
+BOOL coditProcessStat( HPROCOBJ hProc, PROCSTAT *stat );
+void coditProcessStatFree( PROCSTAT *stat );
 typedef struct _PROCENT {
 	PROCSTAT stat;
 	struct dirent *ent;
 } PROCENT;
 typedef BOOL (*ProcNxt_t)( HPROCLST, PPROCENT );
-BOOL CoditProcobjNxt( HPROCLST hpl, PPROCENT ppe );
+BOOL CoditProclstNxt( HPROCLST hpl, PPROCENT ppe );
 #endif
 extern ProcNxt_t CoditProclst1st;
 BOOL CoditProclstPrepAPI( void );
+HPROCLST CoditProclstOpen( int parent );
+HPROCLST CoditProclstShut( HPROCLST hpl );
+BOOL CoditProceentName( PPROCENT ppe, char **name, int *leng );

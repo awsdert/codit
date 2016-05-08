@@ -20,7 +20,7 @@ export PATH:=$(PATH);$(CC_BIN)
 
 rebuild: clean test dobuild
 
-objects: directories $(OBJECTS) CoditConfig.h
+objects: directories $(OBJECTS)
 
 directories: $(DEPDIR)
 
@@ -45,22 +45,25 @@ clean:
 #%MGW64%\bin\mingw32-make.exe
 #c:\tools\mingw64\bin\mingw32-make.exe
 
-src/CoditBuild.c: .git/logs/HEAD
-	"#include \"CoditBuild.h\"" > $@
-	"const long CODIT_MAJOR = ${TARGET_MAJOR};" >> $@
-	"const long CODIT_MINOR = ${TARGET_MINOR};" >> $@
-	while read -r $<; do echo read
-	"const long CODIT_HDATE = 0;" >> $@
-	"const long CODIT_HTIME = 0;" >> $@
-	"const long CODIT_CDATE = 0;" >> $@
-	"const long CODIT_CTIME = 0;" >> $@
+$(SRCDIR)/CoditBuild.c:
+	$@ > "#include \"CoditBuild.h\""
+	$@ >> "const long CODIT_MAJOR = ${TARGET_MAJOR};"
+	$@ >> "const long CODIT_MINOR = ${TARGET_MINOR};"
+	$@ >> "const long CODIT_CDATE = 0;"
+	$@ >> "const long CODIT_CTIME = 0;"
+	
+$(SRCDIR)/CoditHEAD.c: .git/logs/HEAD
+	while line < $<; do echo line
+	$@ > "#include \"CoditBuild.h\""
+	$@ >> "const long CODIT_HDATE = 0;"
+	$@ >> "const long CODIT_HTIME = 0;"
 
-CoditConfig.h:
-	"#define CODIT_MAJOR ${COMPILE_MAJOR}"	>> "${O}$@"
-	"#define CODIT_MINOR ${SYSTEM_NAME}}"	>> "${O}$@"
-	"#define CODIT_BUILD ${COMPILE_BUILD}"	>> "${O}$@"
-	"#define SYSTEM_NAME ${COMPILE_MAJOR}"	>> "${O}$@"
-	"#define SYSTEM_VERS ${SYSTEM_NAME}}"	>> "${O}$@"
+#CoditConfig.h:
+#	"#define CODIT_MAJOR ${COMPILE_MAJOR}"	> "${O}$@"
+#	"#define CODIT_MINOR ${SYSTEM_NAME}}"	>> "${O}$@"
+#	"#define CODIT_BUILD ${COMPILE_BUILD}"	>> "${O}$@"
+#	"#define SYSTEM_NAME ${COMPILE_MAJOR}"	>> "${O}$@"
+#	"#define SYSTEM_VERS ${SYSTEM_NAME}}"	>> "${O}$@"
 
 $(O)codit.o: codit.c
 	${CC} ${CFLAGS} ${Fc} "${TOPDIR}$<" ${Fo} "$@"

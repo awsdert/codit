@@ -1,11 +1,13 @@
-#include "CoditProcobj.h"
+#include "src/CoditProclst.h"
 #include <stdio.h>
 #include <stdlib.h>
+void listAllFile(void);
+void listAllProc(void);
 int main ( int argc, char *argv[] )
 {
 	char *txt = calloc( sizeof(argv[0]) + 15, 1 );
-	sprintf( txt , "%s Version:%d.%d", argv[0],
-		CODIT_VERSION_MAJOR, CODIT_VERSION_MINOR );
+	sprintf( txt , "%s Version:%ld.%ld", argv[0],
+		CODIT_MAJOR, CODIT_MINOR );
 #if USE_IUP
 	IupMessageBox( "Codit", txt );
 #else
@@ -25,13 +27,26 @@ int main ( int argc, char *argv[] )
 void listAllFile( void )
 {
 	char *name = NULL;
+	int leng;
 	char *path =
 #ifdef _WIN32
-		GetCurrentWorkingDirectory();
+		NULL, *temp;
+	leng = 256;
+	path = MREQUEST( NULL, leng );
+	if ( !path ) return;
+	while (	GetCurrentWorkingDirectoryA( leng, path ) == FALSE &&
+		GetLastError() == ERROR_NOT_ENOUGH_MEMORY )
+	{
+		temp = (char*)MREQUEST( path, leng += 256 );
+		if ( !temp )
+		{
+			MRELEASE( path );
+			return;
+		}
+	}
 #else
 		getcwd();
 #endif
-	int leng = 0;
 	HFILELST hfl = CoditFilelstOpen( path );
 	FILEENT fe = {0};
 	if ( CoditFilelst1st( hfl, &fe ) == FALSE )
@@ -48,7 +63,7 @@ void listAllFile( void )
 	while ( CoditFilelstNxt( hfl, &fe ) == TRUE );
 failList:
 	// Safest way to force cleanup
-	while ((hfl = CoditFilelstShut( hfl ));
+	while ((hfl = CoditFilelstShut( hfl )));
 }
 
 void listAllProc( void )
@@ -59,7 +74,7 @@ void listAllProc( void )
 	if ( !hpl ) return;
 	PROCENT pe = {0};
 #ifdef _WIN32
-	pe->dwSize = sizeof( PROCENT );
+	pe.dwSize = sizeof( PROCENT );
 #endif
 	if ( CoditProclst1st( hpl, &pe ) == FALSE )
 		goto done;
@@ -71,7 +86,7 @@ void listAllProc( void )
 #else
 		fputs( name, stdout );
 #endif
-	} while ( CoditProclstNxt( hpl, &hpe ) == TRUE );
+	} while ( CoditProclstNxt( hpl, &pe ) == TRUE );
 done:
 	while ( (hpl = CoditProclstShut( hpl )) );
 }

@@ -13,7 +13,9 @@ typedef struct FILEENT_
 typedef DIR *HFILELST;
 typedef struct dirent *PFILEENT;
 #endif
+BOOL CoditFilelstPrepAPI( void );
 HFILELST CoditFilelstOpen( const char const *path );
 HFILELST CoditFilelstShut( HFILELST hfl );
 BOOL CoditFilelst1st( HFILELST hfl, PFILEENT pfe );
 BOOL CoditFilelstNxt( HFILELST hfl, PFILEENT pfe );
+BOOL CoditFileentName( PFILEENT pfe, char **name, int *leng );

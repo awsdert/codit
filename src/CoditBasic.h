@@ -2,9 +2,10 @@
 #include <CoditBuild.h>
 #include <stddef.h>
 #ifdef _WIN32
-#include <windows.h>
-#define MREQUEST GlobalReAlloc
-#define MRELEASE GlobalFree
+#include <Windows.h>
+#include <Objbase.h>
+#define MREQUEST CoTaskMemRealloc
+#define MRELEASE CoTaskMemFree
 #define MEMMOV MoveMemory
 #define MEMCPY CopyMemory
 #define MEMSET FillMemory
