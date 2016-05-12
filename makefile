@@ -1,7 +1,8 @@
 #Directories
 TOPDIR?=
 include $(TOPDIR)directories.mk
-
+BUILD_NUMBER_FILE=buildnumber.txt
+#include buildnumber.mk
 #Compiler Stuff
 CFLAGS:=$(PRJINC) $(PRJLIB) $(FWall) $(Fstd_c99) $(TARFLG) $(FLG)
 
@@ -16,7 +17,7 @@ $(info $(TARSYS) $(TARBIT)bit compile)
 #$(info OBJECTS=$(OBJECTS))
 #$(error Build cancelled by force)
 
-export PATH:=$(PATH);$(CC_BIN)
+export PATH:=$(CC_BIN);$(PATH)
 
 rebuild: clean test dobuild
 
@@ -25,7 +26,7 @@ objects: directories $(OBJECTS)
 directories: $(DEPDIR)
 
 test: objects $(O)CoditTest.o
-	${CC} ${PRJBIN} ${Fc} $< ${Fo} ${B}CoditTest${TAREXE}
+	${CC} ${PRJBIN} ${Fc} $(OBJECTS) $(O)CoditTest.o ${Fo} ${B}CoditTest${TAREXE}
 
 dobuild: objects $(O)codit.o
 	${CC} ${Fc} $< ${Fo} ${B}codit${TAREXE}
@@ -35,6 +36,7 @@ install: dobuild
 	$(INSTALL_CODIT)
 	$(INSTALL_ICONS)
 
+.PHONY: clean src/CoditBuild.c src/CoditHEAD.c
 clean:
 	${RM} ${OBJDIR}* ${OUTDIR}*
 
@@ -45,18 +47,47 @@ clean:
 #%MGW64%\bin\mingw32-make.exe
 #c:\tools\mingw64\bin\mingw32-make.exe
 
-$(SRCDIR)/CoditBuild.c:
-	$@ > "#include \"CoditBuild.h\""
-	$@ >> "const long CODIT_MAJOR = ${TARGET_MAJOR};"
-	$@ >> "const long CODIT_MINOR = ${TARGET_MINOR};"
-	$@ >> "const long CODIT_CDATE = 0;"
-	$@ >> "const long CODIT_CTIME = 0;"
-	
-$(SRCDIR)/CoditHEAD.c: .git/logs/HEAD
-	while line < $<; do echo line
-	$@ > "#include \"CoditBuild.h\""
-	$@ >> "const long CODIT_HDATE = 0;"
-	$@ >> "const long CODIT_HTIME = 0;"
+domath_str=$(shell $(sh_let) math_result="$(1)" $(sh_addcmd) $(sh_getlet) math_result)
+$(info domath_str=$(domath_str))
+domath=$(subst math_result=,,$(subst  ,,$(call domath_str,$(1))))
+$(info domath=$(domath))
+HEAD_PATH:=$(WKSDIR).git$(DIRSEP)logs$(DIRSEP)HEAD
+$(info PATH=$(HEAD_PATH))
+HEAD_SAFEP:=$(subst \,\\,$(HEAD_PATH))
+$(info SAFEP=$(HEAD_SAFEP))
+HEAD_COUNT_STR:=$(shell find /c " +" $(HEAD_PATH))
+$(info COUNT_STR=$(HEAD_COUNT_STR))
+# % ignores case so we don't need to go out of our way to convert our path to
+# uppercase however it only works in patsubst which ignores the ----------
+# before the path so we get subst to remove the left over leaving the number we
+# wanted
+HEAD_COUNT:=$(subst ---------- ,,$(patsubst %:,,$(HEAD_COUNT_STR)))
+$(info COUNT=$(HEAD_COUNT))
+HEAD_NMONE:=$(call domath,$(HEAD_COUNT) - 1)
+$(info NMONE=$(HEAD_NMONE))
+HEAD_LASTL:=$(shell more +$(HEAD_NMONE) $(HEAD_PATH))
+$(info LASTL=$(HEAD_LASTL))
+BUILD_NUMBER:=$(shell echo < $(BUILD_NUMBER_FILE))
+$(info BUILD_NUMBER=$(BUILD_NUM_VAL))
+
+$(BUILD_NUMBER_FILE):
+	echo $(call domath,$(BUILD_NUMBER) + 1) > $(BUILD_NUMBER_FILE)
+
+src/CoditBuild.c: $(BUILD_NUMBER_FILE)
+	echo #include "CoditBuild.h"> $@
+	@echo /* This file is generated during build,>> $@
+	@echo do not bother modifying*/>> $@
+	echo const long CODIT_MAJOR = ${TARGET_MAJOR};>> $@
+	echo const long CODIT_MINOR = ${TARGET_MINOR};>> $@
+	echo const long CODIT_CDATE = 0;>> $@
+	echo const long CODIT_CTIME = 0;>> $@
+
+src/CoditHEAD.c:
+	echo #include "CoditBuild.h"> $@
+	@echo /* This file is generated during build,>> $@
+	@echo do not bother modifying*/>> $@
+	echo const long CODIT_HDATE = 0;>> $@
+	echo const long CODIT_HTIME = 0;>> $@
 
 #CoditConfig.h:
 #	"#define CODIT_MAJOR ${COMPILE_MAJOR}"	> "${O}$@"
@@ -66,13 +97,13 @@ $(SRCDIR)/CoditHEAD.c: .git/logs/HEAD
 #	"#define SYSTEM_VERS ${SYSTEM_NAME}}"	>> "${O}$@"
 
 $(O)codit.o: codit.c
-	${CC} ${CFLAGS} ${Fc} "${TOPDIR}$<" ${Fo} "$@"
+	${CC} ${CFLAGS} ${Fc} "$<" ${Fo} "$@"
 
 $(O)CoditTest.o: CoditTest.c
-	${CC} ${CFLAGS} ${Fc} "${TOPDIR}$<" ${Fo} "$@"
+	${CC} ${CFLAGS} ${Fc} "$<" ${Fo} "$@"
 
-$(O)%.o: %.c
-	${CC} ${CFLAGS} ${Fc} "${TOPDIR}$<" ${Fo} "$@"
+$(O)%.o: src/%.c
+	${CC} ${CFLAGS} ${Fc} "$<" ${Fo} "$@"
 	
 $(DEPDIR):
 	$(MKDIR) "${DEPDIR}"

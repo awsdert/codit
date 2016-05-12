@@ -5,9 +5,6 @@ CC_BIN:=${CC_DIR}/bin
 CC_LIB:=${CC_DIR}/lib
 CC_INC:=${CC_DIR}/include
 CC:="${CC_BIN}/x86_64-w64-mingw32-gcc.exe"
-RM:=del
-MKDIR:=mkdir
-PWD:=%cd%
 # GCC Style Flags
 Fc:=-c
 Fo:=-o
