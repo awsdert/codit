@@ -36,7 +36,7 @@ install: dobuild
 	$(INSTALL_CODIT)
 	$(INSTALL_ICONS)
 
-.PHONY: clean src/CoditBuild.c src/CoditHEAD.c
+.PHONY: clean src/CoditBuild.c src/CoditHEAD.c $(BUILD_NUMBER_FILE)
 clean:
 	${RM} ${OBJDIR}* ${OUTDIR}*
 
@@ -52,26 +52,31 @@ $(info domath_str=$(domath_str))
 domath=$(subst math_result=,,$(subst  ,,$(call domath_str,$(1))))
 $(info domath=$(domath))
 HEAD_PATH:=$(WKSDIR).git$(DIRSEP)logs$(DIRSEP)HEAD
-$(info PATH=$(HEAD_PATH))
+#$(info PATH=$(HEAD_PATH))
 HEAD_SAFEP:=$(subst \,\\,$(HEAD_PATH))
-$(info SAFEP=$(HEAD_SAFEP))
+#$(info SAFEP=$(HEAD_SAFEP))
 HEAD_COUNT_STR:=$(shell find /c " +" $(HEAD_PATH))
-$(info COUNT_STR=$(HEAD_COUNT_STR))
+#$(info COUNT_STR=$(HEAD_COUNT_STR))
 # % ignores case so we don't need to go out of our way to convert our path to
 # uppercase however it only works in patsubst which ignores the ----------
 # before the path so we get subst to remove the left over leaving the number we
 # wanted
 HEAD_COUNT:=$(subst ---------- ,,$(patsubst %:,,$(HEAD_COUNT_STR)))
-$(info COUNT=$(HEAD_COUNT))
+#$(info COUNT=$(HEAD_COUNT))
 HEAD_NMONE:=$(call domath,$(HEAD_COUNT) - 1)
 $(info NMONE=$(HEAD_NMONE))
 HEAD_LASTL:=$(shell more +$(HEAD_NMONE) $(HEAD_PATH))
-$(info LASTL=$(HEAD_LASTL))
-BUILD_NUMBER:=$(shell echo < $(BUILD_NUMBER_FILE))
-$(info BUILD_NUMBER=$(BUILD_NUM_VAL))
+#$(info LASTL=$(HEAD_LASTL))
+BUILD_NUMBER:=$(shell more $(BUILD_NUMBER_FILE))
+ifeq ("${BUILD_NUMBER}","")
+	BUILD_NUMBER:=0
+endif
+NEXT_BUILD_NUMBER:=$(call domath,$(BUILD_NUMBER) + 1)
+$(info BUILD_NUMBER=$(BUILD_NUMBER))
+$(info NEXT_BUILD_NUMBER=$(NEXT_BUILD_NUMBER))
 
 $(BUILD_NUMBER_FILE):
-	echo $(call domath,$(BUILD_NUMBER) + 1) > $(BUILD_NUMBER_FILE)
+	echo $(NEXT_BUILD_NUMBER)> $@
 
 src/CoditBuild.c: $(BUILD_NUMBER_FILE)
 	echo #include "CoditBuild.h"> $@
