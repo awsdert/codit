@@ -1,13 +1,15 @@
 #pragma once
 
-// For official releases only
-extern const long CODIT_MAJOR;
-extern const long CODIT_MINOR;
-
-// Filled with .git/logs/HEAD last entry date & time
-extern const long CODIT_HDATE;
-extern const long CODIT_HTIME;
-
-// Filled at time of building codit
-extern const long CODIT_CDATE;
-extern const long CODIT_CTIME;
+#ifdef LAST_COMMIT
+#define CODIT_VER_MAJOR   VERSION_MAJOR
+#define CODIT_VER_MINOR   VERSION_MINOR
+#define CODIT_VER_BUILD   VERSION_BUILD
+#define CODIT_LAST_COMMIT LAST_COMMIT
+#else
+#error No version information passed on
+// Not supposed to reach here but just in case silence 'undefined' errors
+#define CODIT_VER_MAJOR   0
+#define CODIT_VER_MINOR   0
+#define CODIT_VER_BUILD   0
+#define CODIT_LAST_COMMIT 0
+#endif
