@@ -1,36 +1,19 @@
 #Directories
 TOPDIR?=
 CDEFS?=
-MAIN_C=codit.c
-MAIN_O=codit.o
 include $(TOPDIR)directories.mk
-include mkfunc/domath.mk
-include builddata.mk
 #Compiler Stuff
 CFLAGS:=$(PRJINC) $(PRJLIB) $(FWall) $(Fstd_c99) $(TARFLG) $(FLG)
-
-#$(info HERE=$(HERE))
 $(info CURDIR=$(CURDIR))
 $(info WKSDIR=$(WKSDIR))
-$(info host/$(SYSTEM)/$(THE_CC)$(THEBIT).mk) 
-$(info $(TARSYS) $(TARBIT)bit compile)
-#$(info B=$(B))
-#$(info O=$(O))
-#$(info SOURCES=$(SOURCES))
-#$(info OBJECTS=$(OBJECTS))
-#$(error Build cancelled by force)
 
 export PATH:=$(CC_BIN);$(PATH)
 
 all: user test
 
-# Only stable code should be used in this one
-include user.mk
-# Any experimtental code should be tested here, may be distributed for public
-# testing
-include test.mk
+include version.mk
 
-.PHONY: clean src/CoditBuild.c src/CoditHEAD.c $(TEST_VERSION_FILE) $(USER_VERSION_FILE)
+.PHONY: clean
 
 rebuild: clean all
 
@@ -61,11 +44,11 @@ clean:
 #	"#define SYSTEM_NAME ${COMPILE_MAJOR}"	>> "${O}$@"
 #	"#define SYSTEM_VERS ${SYSTEM_NAME}}"	>> "${O}$@"
 
-$(O)%.o: src/%.c
+$(O)%.o: $(TOPDIR)src/%.c
 	${CC} ${CFLAGS} $(VDEFS) ${Fc} "$<" ${Fo} "$@"
 	
 $(DEPDIR):
 	$(MKDIR) "${DEPDIR}"
-	
+
 executable:
-	${CC} ${PRJBIN} ${Fc} $(OBJECTS) $(MAIN_O) ${Fo} ${B}$(MAIN_FILE)t${TAREXE}
+	${CC} ${PRJBIN} ${Fc} $(OBJECTS) $(MAIN_O) ${Fo} ${B}$(OUT)

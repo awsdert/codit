@@ -3,6 +3,7 @@
 	"editor.rulers": [80],
 	"editor.insertSpaces": false,
 	"files.associations": {
-		"*.mk" : "makefile"
+		"*.mk" : "makefile",
+		"*.vmk" : "makefile"
 	}
 }

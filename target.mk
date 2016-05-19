@@ -33,6 +33,3 @@ endif
 ifdef WINDOWS64
 	TARFLG+= $(FD)_WIN32
 endif
-
-TARGET_MAJOR=0
-TARGET_MINOR=0
