@@ -13,23 +13,23 @@ else
 	FLG:=$(FD)NDEBUG $(FO)
 endif
 
-TARSYS?=$(SYSTEM)
-TARBIT?=$(SYSBIT)
+TARGET_SYS?=$(SYSTEM)
+TARGET_BIT?=$(SYSBIT)
 
 # Check what kind of executable will be generated
-ifeq ($(TARSYS),windows)
-	TAREXE:=.exe
-	TARDLL:=.dll
-	TARDIR:=win$(TARBIT)
-	TARFLG:=$(FD)_WIN$(TARBIT)
-	WINDOWS$(TARBIT):=1
+ifeq ($(TARGET_SYS),windows)
+	TARGET_EXE:=.exe
+	TARGET_DLL:=.dll
+	TARGET_DIR:=win$(TARGET_BIT)
+	TARGET_FLG:=$(FD)_WIN$(TARGET_BIT)
+	WINDOWS$(TARGET_BIT):=1
 else
-	TAREXE:=
-	TARDLL:=.so
-	TARDIR:=linux
-	TARFLG:=$(FD)__linux__
+	TARGET_EXE:=
+	TARGET_DLL:=.so
+	TARGET_DIR:=linux
+	TARGET_FLG:=$(FD)__linux__
 endif
 
 ifdef WINDOWS64
-	TARFLG+= $(FD)_WIN32
+	TARGET_FLG+= $(FD)_WIN32
 endif

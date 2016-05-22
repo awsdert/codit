@@ -1,24 +1,10 @@
-#include "CoditProclst.h"
-/*
-#include "CoditFileobjOpenShut.c"
-#include "CoditFileobjPutGet.c"
+#include <CoditProclst.h>
 
-#include "CoditFilelstPrepAPI.c"
-#include "CoditFilelstOpenShut.c"
-#include "CoditFilelslNxt.c"
-#include "CoditFileentName.c"
+short VERSION_MAJOR = MK_VERSION_MAJOR;
+short VERSION_MINOR = MK_VERSION_MINOR;
+short VERSION_BUILD = MK_VERSION_BUILD;
+long  LAST_COMMIT	= MK_LAST_COMMIT;
 
-#include "CoditProcobjOpenShut.c"
-#include "CoditProcobjPutGet.c"
-#include "CoditProcobjRun.c"
-
-#include "CoditProclstPrepAPI.c"
-#include "CoditProclstOpenShut.c"
-#include "coditProcentStatus.c"
-#include "CoditProclstNxt.c"
-#include "CoditProcentName.c"
-#include "CoditProcentPid.c"
-*/
 int main( int argc, char *argv[] )
 {
 	return 0;

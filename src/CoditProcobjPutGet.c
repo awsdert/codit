@@ -1,26 +1,28 @@
 #include "CoditProcobj.h"
-fsize_t CoditProcobjSet( HPROCOBJ hpo,
+uint64_t CoditProcobjSet( HPROCOBJ hpo,
 	uintptr_t addr,
 	void const *buff,
-	fsize_t size )
+	uint64_t size )
 {
-	fsize_t b = 0;
 #ifdef _WIN32
+	SIZE_T b = 0;
 	WriteProcessMemory( hpo, (void*)addr, buff, size, &b );
 #else
+	size_t b = 0;
 	seterr( ENOEXEC );
 #endif
 	return b;
 }
-fsize_t CoditProcobjGet( HPROCOBJ hpo,
+uint64_t CoditProcobjGet( HPROCOBJ hpo,
 	uintptr_t addr,
 	void *buff,
-	fsize_t size )
+	uint64_t size )
 {
-	fsize_t b = 0;
 #ifdef _WIN32
+	SIZE_T b = 0;
 	ReadProcessMemory( hpo, (void*)addr, buff, size, &b );
 #else
+	size_t b = 0;
 	seterr( ENOEXEC );
 #endif
 	return b;

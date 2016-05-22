@@ -15,7 +15,7 @@ else
     USER_VERSION_NEXT_MAJOR=$(USER_VERSION_MAJOR)
 endif
 
-user: OUT=codit$(TAREXE)
+user: TARGET_COMPILE=$(COMPILE_BIN)codit$(TARGET_EXE)
 user: TARGET_SMALL=user
 user: TARGET_LARGE=USER
 user: OUTPUT=executable

@@ -1,9 +1,10 @@
+CDEFS?=
 #Directories
 TOPDIR?=
-CDEFS?=
+WKSDIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 include $(TOPDIR)directories.mk
 #Compiler Stuff
-CFLAGS:=$(PRJINC) $(PRJLIB) $(FWall) $(Fstd_c99) $(TARFLG) $(FLG)
+CFLAGS:=$(FWall) $(Fstd_c99) $(TARGET_FLG) $(FLG)
 $(info CURDIR=$(CURDIR))
 $(info WKSDIR=$(WKSDIR))
 
@@ -13,22 +14,21 @@ all: user test
 
 include version.mk
 
-.PHONY: clean
+.PHONY: clean rebuild
 
 rebuild: clean all
 
-objects: version directories $(OBJECTS) $(MAIN_O)
+objects: directories $(OBJECTS)
 
-directories: $(DEPDIR)
-	
+directories: $(ALL_DIRECTORIES)
+
 #install: user
 #	$(error Installation not yet supported)
 #	$(INSTALL_CODIT)
 #	$(INSTALL_ICONS)
 
 clean:
-	${RM} ${OBJDIR}* ${OUTDIR}*
-
+	${RM} ${OBJDIR}* ${BINDIR}*
 
 #Mingw64 absolute paths, %MGW64% is a manually created enviroment variable on
 #windows, an alternative variable to make is %MAKE% which just an absolute path
@@ -37,18 +37,24 @@ clean:
 #%MGW64%\bin\mingw32-make.exe
 #c:\tools\mingw64\bin\mingw32-make.exe
 
-#CoditConfig.h:
-#	"#define CODIT_MAJOR ${COMPILE_MAJOR}"	> "${O}$@"
-#	"#define CODIT_MINOR ${SYSTEM_NAME}}"	>> "${O}$@"
-#	"#define CODIT_BUILD ${COMPILE_BUILD}"	>> "${O}$@"
-#	"#define SYSTEM_NAME ${COMPILE_MAJOR}"	>> "${O}$@"
-#	"#define SYSTEM_VERS ${SYSTEM_NAME}}"	>> "${O}$@"
+# Tell make what headers are needed for each set of objects
+BASIC_H:=CoditBasic.h CoditBuild.h
+FAULT_H:=CoditFault.h $(BASIC_H)
+FILEOBJ_H:=CoditFileobj.h $(FAULT_H)
+$(SRCDIR)/CoditFileobj%.o: $(FILEOBJ_H)
+FILELST_H:=CoditFilelst.h $(FILEOBJ_H)
+$(SRCDIR)/CoditFilelst%.o $(SRCDIR)/CoditFileent%.o: $(FILELST_H)
+PROCOBJ_H:=CoditProcobj.h $(FILELST_H)
+$(SRCDIR)/CoditProcobj%.o: $(PROCOBJ_H)
+PROCLST_H:=CoditProclst.h $(PROCOBJ_H)
+$(SRCDIR)/CoditProclst%.o $(SRCDIR)/CoditProcent%.o: $(PROCLST_H)
+$(T)/$(TARGET_SMALL).o: $(TARGET_SMALL).h $(PROCLST_H)
 
-$(O)%.o: $(TOPDIR)src/%.c
-	${CC} ${CFLAGS} $(VDEFS) ${Fc} "$<" ${Fo} "$@"
-	
-$(DEPDIR):
-	$(MKDIR) "${DEPDIR}"
+$(O)$(TARGET_SMALL).o: $(T)/$(TARGET_SMALL).c
+	$(COMPILE_OBJ) $(CFLAGS) $(VDEFS) $(Fc) "$<" $(Fo) "$@"
 
-executable:
-	${CC} ${PRJBIN} ${Fc} $(OBJECTS) $(MAIN_O) ${Fo} ${B}$(OUT)
+$(O)%.o: $(SRCDIR)/%.c
+	$(COMPILE_OBJ) $(CFLAGS) $(VDEFS) $(Fc) "$<" $(Fo) "$@"
+
+$(ALL_DIRECTORIES):
+	$(MKDIR) "$@"

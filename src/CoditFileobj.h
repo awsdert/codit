@@ -1,8 +1,7 @@
 #pragma once
-#include "CoditBasic.h"
+#include "CoditFault.h"
 #include <stdint.h>
 #ifdef _WIN32
-typedef DWORD fsize_t;
 typedef HANDLE HFILEOBJ;
 typedef SECURITY_ATTRIBUTES OSSAFETY;
 #define FILEOBJ_RECREATE	CREATE_ALWAYS
@@ -31,7 +30,6 @@ typedef SECURITY_ATTRIBUTES OSSAFETY;
 #define FALSE 0
 #endif
 
-typedef unsigned int fsize_t;
 typedef struct _FILEOBJ {
 	int fd;
 	char *buf;
@@ -71,14 +69,14 @@ HFILEOBJ CoditFileobjOpenEx(
 HFILEOBJ CoditFileobjOpen( const char const *path, int flags );
 HFILEOBJ CoditFileobjShut( HFILEOBJ hfo );
 
-fsize_t CoditFileobjGet(
+uint64_t CoditFileobjGet(
 	HFILEOBJ hfo,
 	uintptr_t addr,
 	void *buff,
-	fsize_t size );
+	uint64_t size );
 
-fsize_t CoditFileobjPut(
+uint64_t CoditFileobjPut(
 	HFILEOBJ hfo,
 	uintptr_t addr,
 	void const *buff,
-	fsize_t size );
+	uint64_t size );

@@ -1,5 +1,5 @@
 #pragma once
-#include <CoditConfig.h>
+#include "CoditBasic.h"
 #ifdef _WIN32
 #include <winerror.h>
 #define SysGetFault()		GetLastError()

@@ -7,8 +7,8 @@ typedef PROCESSENTRY32 PROCENT, *PPROCENT;
 typedef HANDLE (WINAPI *CreateTH32SnapShot_t)( DWORD, DWORD );
 typedef BOOL (WINAPI *CloseTH32SnapShot_t)( HANDLE );
 typedef BOOL (WINAPI *ProcNxt_t)( HANDLE, LPPROCESSENTRY32 );
-extern CreateTH32SnapShot_t CreateTH32SnapShot;
-extern CloseTH32SnapShot_t CloseTH32SnapShot;
+extern CreateTH32SnapShot_t CreateTH32Snapshot;
+extern CloseTH32SnapShot_t CloseTH32Snapshot;
 extern ProcNxt_t CoditProclstNxt;
 #else
 typedef struct _PROCLST {

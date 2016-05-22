@@ -17,7 +17,7 @@ BOOL CoditFilelstNxt( HFILELST hfl, PFILEENT pfe )
 #ifdef _WIN32
 	if ( FindNextFile( pfe->ent, &pfe->data ) == TRUE )
 		return TRUE;
-	CloseFile( pfe->ent );
+	FindClose( pfe->ent );
 	return FALSE;
 #else
 	pfe->ent = readdir( hfl );

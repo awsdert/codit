@@ -15,7 +15,7 @@ else
     TEST_VERSION_NEXT_MAJOR=$(TEST_VERSION_MAJOR)
 endif
 
-test: OUT=codit_test$(TAREXE)
+test: TARGET_COMPILE=$(COMPILE_BIN)codit_test$(TARGET_EXE)
 test: TARGET_SMALL=test
 test: TARGET_LARGE=TEST
 test: OUTPUT=executable

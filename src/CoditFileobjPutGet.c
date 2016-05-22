@@ -1,13 +1,16 @@
 #include "CoditFileobj.h"
 
-void CoditFileobjSeek( HFILEOBJ hfo, uintptr_t addr )
+// For private usage since not needed else at the moment
+void CoditFileobjSeek( HFILEOBJ hfo, uint64_t addr )
 {
 #ifdef _WIN32
 	LARGE_INTEGER i;
 	if ( addr > INT64_MAX )
 	{
-		i.QuadPart = (LONGLONG)(UINT64_MAX - addr);
-		SetFilePointerEx( hfo, i, NULL, FILEOBJ_SEEK_END );
+		i.QuadPart = (LONGLONG)INT64_MAX;
+		SetFilePointerEx( hfo, i, NULL, FILEOBJ_SEEK_SET );
+		i.QuadPart = (LONGLONG)(addr - INT64_MAX);
+		SetFilePointerEx( hfo, i, NULL, FILEOBJ_SEEK_CUR );
 	}
 	else
 	{
@@ -19,33 +22,35 @@ void CoditFileobjSeek( HFILEOBJ hfo, uintptr_t addr )
 #endif
 }
 
-fsize_t CoditFileobjPut(
+uint64_t CoditFileobjPut(
 	HFILEOBJ hFt,
 	uintptr_t addr,
 	void const *buff,
-	fsize_t size )
+	uint64_t size )
 {
-	fsize_t b = 0;
 	CoditFileobjSeek( hFt, addr );
 #ifdef _WIN32
+	DWORD b = 0;
 	WriteFile( hFt, buff, size, &b, NULL );
 #else
+	uint64_t b = 0;
 	b = _write( hFt, buff, size );
 #endif
 	return b;
 }
 
-fsize_t CoditFileobjGet(
+uint64_t CoditFileobjGet(
 	HFILEOBJ hFt,
 	uintptr_t addr,
 	void *buff,
-	fsize_t size )
+	uint64_t size )
 {
-	fsize_t b = 0;
 	CoditFileobjSeek( hFt, addr );
 #ifdef _WIN32
+	DWORD b = 0;
 	ReadFile( hFt, buff, size, &b, NULL );
 #else
+	uint64_t b = 0;
 	b = _read( hFt, buff, size );
 #endif
 	return b;

@@ -26,15 +26,15 @@ typedef struct _PROCOBJ {
 HPROCOBJ CoditProcobjOpen( int pid, int flags );
 HPROCOBJ CoditProcobjShut( HPROCOBJ hpo );
 
-fsize_t CoditProcobjCpy(
+uint64_t CoditProcobjCpy(
 	HPROCOBJ hpo,
 	uintptr_t addr,
 	void *buff,
-	fsize_t size );
+	uint64_t size );
 
-fsize_t CoditProcobjSet(
+uint64_t CoditProcobjSet(
 	HPROCOBJ hpo,
 	uintptr_t addr,
 	void const *buff,
-	fsize_t size );
+	uint64_t size );
 	
