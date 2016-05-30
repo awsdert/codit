@@ -1,4 +1,4 @@
-#include "CoditProclst.h"
+#include <CoditProclst.h>
 #ifndef _WIN32
 BOOL coditProcobjStatAlloc( struct dirent *ent, PROCSTAT *stat )
 {

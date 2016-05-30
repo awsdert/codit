@@ -1,4 +1,4 @@
-#include "CoditProcobj.h"
+#include <CoditProcobj.h>
 
 HPROCOBJ CoditProcobjRun( char *path, char *options )
 {

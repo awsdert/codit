@@ -1,6 +1,5 @@
 #include <CoditProclst.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 short VERSION_MAJOR = MK_VERSION_MAJOR;
 short VERSION_MINOR = MK_VERSION_MINOR;
@@ -12,8 +11,8 @@ void listAllProc(void);
 int main ( int argc, char *argv[] )
 {
 	char *txt = calloc( sizeof(argv[0]) + 15, 1 );
-	sprintf( txt , "%s Version:%ld.%ld", argv[0],
-		CODIT_MAJOR, CODIT_MINOR );
+	sprintf( txt , "%s Version:%hi.%hi.%hi", argv[0],
+		VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD );
 #if USE_IUP
 	IupMessageBox( "Codit", txt );
 #else

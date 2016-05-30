@@ -1,4 +1,4 @@
-#include "CoditProcobj.h"
+#include <CoditProcobj.h>
 
 HPROCOBJ CoditProcobjOpen( int access, int pid )
 {
