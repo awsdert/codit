@@ -21,7 +21,6 @@ $(version): VDEFS+= $(FD)MK_VERSION_MAJOR=$(VERSION_MAJOR)
 $(version): VDEFS+= $(FD)MK_VERSION_MINOR=$(VERSION_MINOR)
 $(version): VDEFS+= $(FD)MK_LAST_COMMIT=$(COMMIT_LOG_DATE_TIME)
 $(version): SOURCES+= $(S)$@.c
-$(version): COMPILE_BIN=$(CC) $(TARGET_LIBS) $(Fc) $(TARGET_OBJECTS) $(Fo)
 $(version):
 	@echo VERSION_BUILD=$(VERSION_BUILD)
 	@echo VERSION_MINOR=$(VERSION_MINOR)
@@ -29,9 +28,10 @@ $(version):
 	echo:$(TARGET_LARGE)_VERSION_BUILD=$(VERSION_NEXT_BUILD) > $(VMK)
 	echo:$(TARGET_LARGE)_VERSION_MINOR=$(VERSION_NEXT_MINOR) >> $(VMK)
 	echo:$(TARGET_LARGE)_VERSION_MAJOR=$(VERSION_NEXT_MAJOR) >> $(VMK)
-	$(COMPILE_BIN) "${${TARGET_LARGE}_OUT}"
+	$(CC) $(CFLAGS) $(TARGET_LIBS) $(Fo) "${${TARGET_LARGE}_OUT}" $(TARGET_OBJECTS)
 
 # General linker files
+$(O)Codit%.o: TARGET_LIBS:=$(OBJ_LIBS)
 $(O)CoditFileobj%.o: $(FILEOBJ_H)
 $(O)CoditFilelst%.o $(O)CoditFileent%.o: $(FILELST_H)
 $(O)CoditProcobj%.o: $(PROCOBJ_H)
@@ -39,4 +39,4 @@ $(O)CoditProclst%.o $(O)CoditProcent%.o: $(PROCLST_H)
 
 # Produce linker files
 $(O)%.o: $(S)%.c
-	$(CC) $(CFLAGS) $(VDEFS) $(Fc) "$<" $(Fo) "$@"
+	$(CC) $(CFLAGS) $(VDEFS) $(TARGET_LIBS) $(Fo) $@ $(Fc) $<

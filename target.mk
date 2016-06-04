@@ -7,10 +7,10 @@ include $(TOPDIR)host/$(SYSTEM)/$(THE_CC)$(THEBIT).mk
 #DEBUG is to be set at command line level (eg DEBUG=1)
 ifdef DEBUG
 	DBG:=d_
-	DBG_DEFS:=$(FD)_DEBUG $(Fgdb)
+	DBG_DEFS:=$(FD)_DEBUG $(Fggdb)
 else
 	DBG:=
-	DBG_DEFS:=$(FD)NDEBUG $(FO)
+	DBG_DEFS:=$(FD)NDEBUG
 endif
 
 TARGET_SYS?=$(SYSTEM)
@@ -20,12 +20,14 @@ TARGET_BIT?=$(SYSBIT)
 ifeq ($(TARGET_SYS),windows)
 	TARGET_BIN_EXT:=.exe
 	TARGET_LIB_EXT:=.dll
+	CC_LIBS:=$(Fl)kernel32
 	TARGET_DIR:=win$(TARGET_BIT)
 	TARGET_DEFS:=$(FD)_WIN$(TARGET_BIT)
 	WINDOWS$(TARGET_BIT):=1
 else
 	TARGET_BIN_EXT:=
 	TARGET_LIB_EXT:=.so
+	CC_LIBS:=
 	TARGET_DIR:=linux
 	TARGET_DEFS:=$(FD)__linux__
 endif

@@ -17,7 +17,8 @@ endif
 
 TEST_OUT:=$(B)codit_test$(TARGET_BIN_EXT)
 test: TARGET_LARGE:=TEST
-test: TARGET_LIBS:=
+test: TARGET_LIBS:=$(BIN_LIBS) $(Fl)shell32
 test: TARGET_OBJECTS:=$(OBJECTS) $(O)test.o
-test: paths $(TARGET_OBJECTS)
+test: paths $(OBJECTS) $(O)test.o
+$(O)test.o: TARGET_LIBS:=$(OBJ_LIBS) $(Fl)shell32
 $(O)test.o: $(PROCLST_H)

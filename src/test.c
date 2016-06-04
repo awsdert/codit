@@ -39,7 +39,7 @@ void listAllFile( void )
 	leng = 256;
 	path = MREQUEST( NULL, leng );
 	if ( !path ) return;
-	while (	GetCurrentWorkingDirectoryA( leng, path ) == FALSE &&
+	while (	GetCurrentDirectoryA( leng, path ) == FALSE &&
 		GetLastError() == ERROR_NOT_ENOUGH_MEMORY )
 	{
 		temp = (char*)MREQUEST( path, leng += 256 );

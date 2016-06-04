@@ -1,5 +1,5 @@
 #include <CoditFileobj.h>
-HFILEOBJ CoditOpenFileobjEx(
+HFILEOBJ CoditFileobjOpenEx(
 	const char const *path,
 	int access,
 	int share,

@@ -4,8 +4,8 @@
 #ifdef _WIN32
 #include <Windows.h>
 #include <Objbase.h>
-#define MREQUEST CoTaskMemRealloc
-#define MRELEASE CoTaskMemFree
+#define MREQUEST( POINTER, SIZE ) HeapReAlloc( GetProcessHeap(), 0, POINTER, SIZE )
+#define MRELEASE( POINTER ) HeapFree( GetProcessHeap(), 0, POINTER )
 #define MEMMOV MoveMemory
 #define MEMCPY CopyMemory
 #define MEMSET FillMemory

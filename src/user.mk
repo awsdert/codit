@@ -17,7 +17,8 @@ endif
 
 USER_OUT:=$(B)codit$(TARGET_BIN_EXT)
 user: TARGET_LARGE:=USER
-user: TARGET_LIBS:=
+user: TARGET_LIBS:=$(BIN_LIBS) $(Fl)shell32
 user: TARGET_OBJECTS:=$(OBJECTS) $(O)user.o
-user: paths $(TARGET_OBJECTS)
+user: paths $(OBJECTS) $(O)user.o
+$(O)user.o: TARGET_LIBS:=$(OBJ_LIBS) $(Fl)shell32
 $(O)user.o: $(PROCLST_H)
