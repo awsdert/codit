@@ -1,0 +1,46 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "C++ Launch (Win64 GDB)",
+			"type": "cppdbg",
+			"request": "launch",
+			"launchOptionType": "Local",
+			"miDebuggerPath": "${MGW64}\\bin\\gdb.exe",
+			"targetArchitecture": "x86_64",
+			"program": "${workspaceRoot}/bin/win64/d_codit_test.exe",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceRoot}/bin/win64",
+			"preLaunchTask": "Make Test (Debug)",
+			"environment": []
+		},
+		{
+			"name": "C++ Launch (Win32 GDB)",
+			"type": "cppdbg",
+			"request": "launch",
+			"launchOptionType": "Local",
+			"miDebuggerPath": "${MGW32}\\bin\\gdb.exe",
+			"targetArchitecture": "x86",
+			"program": "${workspaceRoot}/bin/win32/d_codit_test.exe",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceRoot}/bin/win32",
+			"preLaunchTask": "Make Test (Debug)",
+			"environment": []
+		},
+		{
+			"name": "C++ Launch (Linux GDB)",
+			"type": "cppdbg",
+			"request": "launch",
+			"launchOptionType": "Local",
+			"miDebuggerPath": "/usr/bin/gdb",
+			"program": "${workspaceRoot}/bin/linux/d_codit_test",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceRoot}/bin/linux",
+			"preLaunchTask": "Make Test (Debug)",
+			"environment": []
+		}
+	]
+}

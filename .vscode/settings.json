@@ -2,6 +2,7 @@
 {
 	"editor.rulers": [80],
 	"editor.insertSpaces": false,
+	"editor.renderWhitespace": true,
 	"files.associations": {
 		"*.mk" : "makefile",
 		"*.vmk" : "makefile"

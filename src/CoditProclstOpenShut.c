@@ -6,7 +6,7 @@ HPROCLST CoditProclstOpen( int ppid )
 }
 HPROCLST CoditProclstShut( HPROCLST hpl )
 {
-	if ( CloseTH32Snapshot( hpl ) == TRUE )
+	if ( CloseHandle( hpl ) == TRUE )
 		return NULL;
 	return hpl;
 }

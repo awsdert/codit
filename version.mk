@@ -32,6 +32,7 @@ $(version):
 
 # General linker files
 $(O)Codit%.o: TARGET_LIBS:=$(OBJ_LIBS)
+$(O)CoditBasic%.o: $(FAULT_H)
 $(O)CoditFileobj%.o: $(FILEOBJ_H)
 $(O)CoditFilelst%.o $(O)CoditFileent%.o: $(FILELST_H)
 $(O)CoditProcobj%.o: $(PROCOBJ_H)

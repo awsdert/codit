@@ -1,0 +1,29 @@
+{
+	"version" : "0.1.0",
+	"windows" : {
+		"command" : "%MGW64%\\bin\\mingw32-make.exe",
+		"isShellCommand": true,
+		"suppressTaskName": true,
+		"tasks":
+		[
+			{
+				"taskName" : "Make User",
+				"isBuildCommand": true,
+				"args" : [ "user" ]
+			},
+			{
+				"taskName" : "Make User (Debug)",
+				"args" : [ "user", "DEBUG=1" ]
+			},
+			{
+				"taskName" : "Make Test",
+				"args" : [ "test" ]
+			},
+			{
+				"taskName" : "Make Test (Debug)",
+				"isTestCommand": true,
+				"args" : [ "test", "DEBUG=1" ]
+			}
+		]
+	}
+}

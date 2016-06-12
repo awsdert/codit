@@ -2,13 +2,12 @@
 #include "CoditProcobj.h"
 
 #ifdef _WIN32
+#include <TlHelp32.h>
 typedef HANDLE HPROCLST;
 typedef PROCESSENTRY32 PROCENT, *PPROCENT;
 typedef HANDLE (WINAPI *CreateTH32Snapshot_t)( DWORD, DWORD );
-typedef BOOL (WINAPI *CloseTH32Snapshot_t)( HANDLE );
 typedef BOOL (WINAPI *ProcNxt_t)( HANDLE, LPPROCESSENTRY32 );
 extern CreateTH32Snapshot_t CreateTH32Snapshot;
-extern CloseTH32Snapshot_t CloseTH32Snapshot;
 extern ProcNxt_t CoditProclstNxt;
 #else
 typedef struct _PROCLST {
@@ -40,4 +39,4 @@ extern ProcNxt_t CoditProclst1st;
 BOOL CoditProclstPrepAPI( void );
 HPROCLST CoditProclstOpen( int parent );
 HPROCLST CoditProclstShut( HPROCLST hpl );
-BOOL CoditProceentName( PPROCENT ppe, char **name, int *leng );
+BOOL CoditProceentName( PAGES pages, PPROCENT ppe, char **name, int *leng );

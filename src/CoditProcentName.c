@@ -1,19 +1,26 @@
 #include <CoditProclst.h>
-BOOL CoditProceentName( PPROCENT ppe, char **name, int *leng )
+BOOL CoditProceentName( PAGES pages, PPROCENT ppe, char **name, int *leng )
 {
-	char *n = name ? *name : NULL, *exe = NULL;
+	if ( !ppe || !name || !leng )
+		return FALSE;
+	char *n = *name, *exe = NULL;
 	void *tmp = NULL;
-	int l = leng ? *leng : (n ? strlen(n) : 0), min =
+	int l = *leng, min =
 #ifdef _WIN32
-		STRLEN( (exe = ppe->szExeFile) ) + 1;
+		CoditStrLen( (exe = ppe->szExeFile) ) + 1;
 #else
 		ppe->len + 1;
 	exe = *ppe->comm;
 #endif
 	if ( min > l )
 	{
-		tmp = MREQUEST( NULL, min );
-		if ( !tmp ) return FALSE;
+		tmp = n ? CoditMemReplace( pages, 0, n, l, min ) :
+			CoditMemRequest( pages, 0, min );
+		if ( !tmp )
+		{
+			CoditDebugPuts( "CoditProceentName(): Could not allocate text" )
+			return FALSE;
+		}
 		l = min;
 		n = (char*)tmp;
 	}
@@ -21,9 +28,13 @@ BOOL CoditProceentName( PPROCENT ppe, char **name, int *leng )
 	{
 		MEMSET( n, 0, l );
 		MEMCPY( n, exe, l );
-		if ( leng ) *leng = l;
+		if ( leng ) *leng = name ? l : 0;
 		if ( name ) *name = n;
-		else MRELEASE( name );
+		else
+		{
+			CoditDebugPuts( "CoditProceentName(): parameter <name> was NULL" )
+			CoditMemRelease( pages, 0, n );
+		}
 		return TRUE;
 	}
 	return FALSE;

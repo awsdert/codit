@@ -8,7 +8,7 @@
 #define MK_LAST_COMMIT	 0
 #endif
 
-extern short VERSION_MAJOR;
-extern short VERSION_MINOR;
-extern short VERSION_BUILD;
-extern long  LAST_COMMIT;
+extern unsigned short VERSION_MAJOR;
+extern unsigned short VERSION_MINOR;
+extern unsigned short VERSION_BUILD;
+extern unsigned long  LAST_COMMIT;

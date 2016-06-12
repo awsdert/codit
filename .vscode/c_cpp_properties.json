@@ -1,0 +1,17 @@
+{
+	"configurations" : 
+	[
+		{
+			"name" : "Win64",
+			"includePath" : "%MGW64%\\x86_64-mingw32\\include"
+		},
+		{
+			"name" : "Win32",
+			"includePath" : "%MGW32%\\include"
+		},
+		{
+			"name" : "Linux",
+			"includePath" : "/usr/include"
+		}
+	]
+}

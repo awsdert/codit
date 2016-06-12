@@ -1,0 +1,2 @@
+TOPDIR:=../../
+include $(TOPDIR)makefile
