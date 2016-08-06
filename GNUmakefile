@@ -84,24 +84,6 @@ PATH2TEXT_SEP="$(subst $(bslash),$(bslash)$(bslash),$(call $(1)_PATH_SEP,$(2)))"
 FILE_FULL_RD=$$(shell more < $$(call PATH2TEXT_SEP,FULL,$(1)))
 FIND_LINE_IN=$$(filter $(1),$$(call FILE_FULL_RD,$(2)))
 
-define PRINT_INC_FILTER
-$(subst $(hash)include_,,$(filter $(hash)include_%,$(subst $(space)$(1),_,$(subst $(2),,$(3)))))
-endef
-
-PRINT_INCLUDES=
-
-define PRINT_INC
-$(strip
-$(eval $(0)_SRC=$(call FILE_FULL_RD,$(1)))
-$(eval $(0)_REMOTE=$(call PRINT_INC_FILTER,$(openc),$(shutc),$($(0)_SRC)))
-$(eval $(0)_WSPACE=$(call PRINT_INC_FILTER,$(quote),$(quote),$($(0)_SRC)))
-$(eval $(0)_SRC=0)
-$(eval $(0)LUDES+=$($(0)_REMOTE) $($(0)_WSPACE)))
-# State $(1) dependencies
-$(3): $($(0)_REMOTE) $($(0)_WSPACE)
-
-endef
-
 # Read/Write Last Modified to dependency file
 define CODIT_SRC_MOD_RD
 $(strip $($(if $(wilcard $(1).prevmod),subst $(1).prevmod=,eval 0)
@@ -125,20 +107,35 @@ $(eval $(0)_CALL=$(call if_eql,$($(0)_PREVMOD),$($(0)_LASTMOD),_UPTODATE,_UPDATE
 $(call $($(0)_CALL),$($(0)_SRC),$($(0)_DEP),$(1:.d=.o),$($(0)_CFLAGS),$($(0)_LASTMOD))
 endef
 
-define HEADER_DEP
-$(1): 
+DEP_FILE=$(CODIT_DIR)dependencies.mk
 
+define PRINT_INC_FILTER
+$(subst $(hash)include_,,$(filter $(hash)include_%,$(subst $(space)$(1),_,$(subst $(2),,$(3)))))
 endef
 
-$(info $(foreach src,$(CODIT_SRC),$(call PRINT_INC,$(CODIT__SRC_DIR)$(src),$(CODIT_T_DEP_DIR)/$(patsubst %.c,%.d,$(src)),$(patsubst %.c,%.o,$(src)))))
-$(eval PRINT_INCLUDES:=$(sort $(PRINT_INCLUDES)))
-$(subst $(space),$(newline),$(foreach header,$(PRINT_INCLUDES),$(call HEADER_DEP,$(header))))
-$(info $(hash) Begin compiling dependencies)
-$(eval $(foreach codit_d,$(CODIT_DEP),$(call CODIT_GEN_DEP,$(codit_d),.c)))
-#$(error Aborting)
+PRINT_INCLUDES=
 
-#include $(addprefix $(CODIT_T_DEP_DIR)/,$(CODIT_DEP))
+define PRINT_INC
+$(strip
+$(eval $(0)_SRC=$(call FILE_FULL_RD,$(1)))
+$(eval $(0)_REMOTE=$(call PRINT_INC_FILTER,$(openc),$(shutc),$($(0)_SRC)))
+$(eval $(0)_WSPACE=$(call PRINT_INC_FILTER,$(quote),$(quote),$($(0)_SRC)))
+$(eval $(0)_SRC=0)
+$(eval $(0)LUDES+=$($(0)_REMOTE) $($(0)_WSPACE))
+$(shell >>$(DEP_FILE) echo $(hash) State $(1) dependencies)
+$(shell >>$(DEP_FILE) echo $(2): $(filter Codit%,$($(0)_REMOTE) $($(0)_WSPACE)))
+)
+endef
 
+$(shell >$(DEP_FILE) echo $(hash) DO NOT MODIFY! Generated on the fly)
+$(foreach src,$(CODIT_SRC),$(call PRINT_INC,$(CODIT__SRC_DIR)$(src),$(patsubst %.c,%.o,$(src))))
+$(eval PRINT_INCLUDES:=$(filter Codit%,$(sort $(PRINT_INCLUDES))))
+$(foreach header,$(PRINT_INCLUDES),$(shell >>$(DEP_FILE) echo $(header)$(colon)))
+#$(info $(hash) Begin compiling dependencies)
+#$(eval $(foreach codit_d,$(CODIT_DEP),$(call CODIT_GEN_DEP,$(codit_d),.c)))
+include $(DEP_FILE)
+
+main: codit_main
 include $(CODIT__SRC_DIR)codit_main.vmk
 codit_main_CFLAGS:=$(CODIT_T_CFLAGS)
 codit_main_LFLAGS:=$(CODIT_T_LFLAGS)
@@ -148,6 +145,7 @@ codit_main_out:=$(TARGET_BIN_EXT)
 codit_main.o: Codit-ProcLst.h
 codit_main.out codit_main.vmk: CODIT_T=codit_main
 
+test: codit_test
 include $(CODIT__SRC_DIR)codit_test.vmk
 codit_test_CFLAGS:=$(CODIT_T_CFLAGS)
 codit_test_LFLAGS:=$(CODIT_T_LFLAGS)
