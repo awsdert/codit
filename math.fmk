@@ -28,11 +28,10 @@ ifneq ($(origin COMSPEC),'undefined')
 else
 	sh_rm_f=rm -f
 	sh_mkdir=mkdir
-	_sh_var=$
-	sh_var=$(_sh_var)$(1)
+	sh_var=$$$(1)
 	sh_let=let "$(1)=$(2)"
 	sh_addcmd=;
-	sh_get=echo $(_sh_var)$(1)
+	sh_get=echo $$$(1)
 	_sh_eql==
 	_sh_neq=!$(sh_eql)
 	_sh_gtr=>
@@ -48,9 +47,9 @@ else
 endif
 
 # Echos name=result
-sh_echomath=$(shell $(call sh_let,tmp,$(1)) $(sh_addcmd) $(call sh_get,tmp))
+sh_echomath=$(shell $(call sh_let,codit,$(1)) $(sh_addcmd) $(call sh_get,codit))
 # $(call sh_math,expression)
-sh_math=$(subst  ,,$(subst tmp=,,$(call sh_echomath,$(1))))
+sh_math=$(subst $(space),,$(subst codit=,,$(call sh_echomath,$(1))))
 # $(call sh_cmp,num1,cmp_operater,num2,result_if_true,result_if_false)
 sh__cmp__set=$(call sh_let,tmp$(1),$(2)) $(sh_addcmd)
 sh__cmp_set=$(call sh__cmp__set,1,$(1)) $(call sh__cmp__set,2,$(2))

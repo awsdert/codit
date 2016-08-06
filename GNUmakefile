@@ -25,10 +25,10 @@ CODIT_T_LFLAGS.c=
 endif
 
 CODIT_SRC:=$(sort $(notdir $(wildcard $(CODIT__SRC_DIR)*.c)))
-CODIT_OBJ:=$(CODIT_patsubst %.c,%.o)
-CODIT_DEP:=$(CODIT_patsubst %.c,%.d)
-CODIT_OUT:=$(CODIT_TARGETS:=.out)
-CODIT_VMK:=$(CODIT_TARGETS:=.vmk)
+CODIT_OBJ:=$(CODIT_SRC %.c,%.o)
+CODIT_DEP:=$(CODIT_SRC %.c,%.d)
+CODIT_OUT:=$(addprefix codit_,$(CODIT_TARGETS:=.out))
+CODIT_VMK:=$(CODIT_OUT:.out=.vmk)
 
 #$(call *,FileToCheck, FileToAppendVariableTo, VariableToSet)
 NIX_STAT_MODIFIED=echo $$(stat -c %Y $(1))
@@ -118,75 +118,69 @@ PRINT_INCLUDES=
 define PRINT_INC
 $(strip
 $(eval $(0)_SRC=$(call FILE_FULL_RD,$(1)))
-$(eval $(0)_REMOTE=$(call PRINT_INC_FILTER,$(openc),$(shutc),$($(0)_SRC)))
-$(eval $(0)_WSPACE=$(call PRINT_INC_FILTER,$(quote),$(quote),$($(0)_SRC)))
-$(eval $(0)_SRC=0)
-$(eval $(0)LUDES+=$($(0)_REMOTE) $($(0)_WSPACE))
+$(eval $(0)_VAL:=$(call PRINT_INC_FILTER,$(openc),$(shutc),$($(0)_SRC)))
+$(eval $(0)_VAL+= $(call PRINT_INC_FILTER,$(quote),$(quote),$($(0)_SRC)))
+$(eval $(0)_SRC=$(filter Codit%,$($(0)_VAL))$(filter codit%,$($(0)_VAL)))
+$(eval $(0)LUDES+=$($(0)_SRC))
 $(shell >>$(DEP_FILE) echo $(hash) State $(1) dependencies)
-$(shell >>$(DEP_FILE) echo $(2): $(filter Codit%,$($(0)_REMOTE) $($(0)_WSPACE)))
+$(shell >>$(DEP_FILE) echo $(2): $(filter Codit%,$($(0)_SRC)))
 )
 endef
 
 $(shell >$(DEP_FILE) echo $(hash) DO NOT MODIFY! Generated on the fly)
 $(foreach src,$(CODIT_SRC),$(call PRINT_INC,$(CODIT__SRC_DIR)$(src),$(patsubst %.c,%.o,$(src))))
 $(eval PRINT_INCLUDES:=$(sort $(PRINT_INCLUDES)))
-$(eval PRINT_INCLUDES:=$(filter Codit%,$(PRINT_INCLUDES)) $(filter codit%,$(PRINT_INCLUDES)))
 $(foreach header,$(PRINT_INCLUDES),$(shell >>$(DEP_FILE) echo $(header)$(colon)))
 include $(DEP_FILE)
 
-main: codit_main
+main: codit_main.out
 include $(CODIT__SRC_DIR)codit_main.vmk
 codit_main_CFLAGS:=$(CODIT_T_CFLAGS)
 codit_main_LFLAGS:=$(CODIT_T_LFLAGS)
-codit_main_c:=$(wildcard $(CODIT__SRC_DIR)Codit-*.c) $(CODIT__SRC_DIR)codit_main.c
-codit_main_o:=$(main_c:=.c=.o)
+codit_main_c:=$(wildcard $(CODIT__SRC_DIR)*-*.c) $(CODIT__SRC_DIR)codit_main.c
+codit_main_o:=$(codit_main_c:=.c=.o)
 codit_main_out:=$(TARGET_BIN_EXT)
-codit_main.o: Codit-ProcLst.h
 codit_main.out codit_main.vmk: CODIT_T=codit_main
 
-test: codit_test
+test: codit_test.out
 include $(CODIT__SRC_DIR)codit_test.vmk
 codit_test_CFLAGS:=$(CODIT_T_CFLAGS)
 codit_test_LFLAGS:=$(CODIT_T_LFLAGS)
-codit_test_c:=$(wildcard $(CODIT__SRC_DIR)Codit-*.c) $(CODIT__SRC_DIR)codit_test.c
-codit_test_o:=$(test_c:=.c=.o)
+codit_test_c:=$(wildcard $(CODIT__SRC_DIR)*-*.c) $(CODIT__SRC_DIR)codit_test.c
+codit_test_o:=$(codit_test_c:=.c=.o)
 codit_test_out:=$(TARGET_BIN_EXT)
-codit_test.o: Codit-ProcLst.h
 codit_test.out codit_test.vmk: CODIT_T=codit_test
 
-$(CODIT_OUT): %.out: %.vmk directories $($(CODIT_T)_o)
-	$(eval PATH=$(CC_PATH))
-	$(eval DOT_OUT=$(CODIT__OUT_DIR)$@)
+export PATH=$(CC_PATH)
+
+$(CODIT_OUT): $(eval OBJECTS=$($(CODIT_T)_o))
+$(CODIT_OUT): %.out: %.vmk $(OBJECTS)
+	$(eval DOT_OUT=$(CODIT_T_OUT_DIR)/$@)
 	$(eval BIN_OUT=$(subst .out,$($(CODIT_T)_out),$(DOT_OUT)))
-	$(info OUT $@:$<)
-	$(CC) $($(CODIT_T)_LFLAGS) $(Fo) $(DOT_OUT) $($(CODIT_T)_o)
+	$(info OUT $@: $(BIN_OUT): $<)
+	$(CC) $($(CODIT_T)_LFLAGS) $(Fo) $(DOT_OUT) $(OBJECTS)
 	copy $(DOT_OUT) $(BIN_OUT)
 
 # General linker files
 $(CODIT_OBJ): %.o: $(CODIT__SRC_DIR)%.c
-	$(eval PATH=$(CC_PATH))
 	$(info OBJ $@: $<)
 	$(CC) $($(CODIT_T)_CFLAGS) $($(CODIT_T)_LFLAGS)\
 	$(Fo) $(CODIT_T_OBJ_DIR)$@ $(Fc) $<
 
 $(CODIT_VMK): $($(CODIT_T)_c)
 	$(eval VMK=$(CODIT__SRC_DIR)$@)
-	$(eval VER=codit_$(CODIT_T)_)
-	$(eval PRVBUILD=$(subst  ,,$($(VER)BUILD)))
-	$(eval PRVMINOR=$(subst  ,,$($(VER)MINOR)))
-	$(eval PRVMAJOR=$(subst  ,,$($(VER)MAJOR)))
+	$(eval VER=$(CODIT_T)_)
 	$(eval _BUILD=$(call sh_math,+1))
-	$(eval __MINOR=$(call sh_math,$(PRVMINOR)+1))
-	$(eval _MINOR=$(call sh_lss,$(_BUILD),10000,$(PRVMINOR),$(__MINOR)))
-	$(eval _MAJOR=$(call sh_math,$(PRVMAJOR)+1))
+	$(eval __MINOR=$(call sh_math,$($(VER)BUILD)+1))
+	$(eval _MINOR=$(call sh_lss,$(_BUILD),10000,$($(VER)MINOR),$(__MINOR)))
+	$(eval _MAJOR=$(call sh_math,$($(VER)MAJOR)+1))
 	$(eval BUILD=$(call sh_lss,$(_BUILD),10000,$(_BUILD),0))
 	$(eval MINOR=$(call sh_lss,$(_MINOR),100,$(_MINOR),0))
-	$(eval MAJOR=$(call sh_lss,$(_MINOR),100,$(PRVMAJOR),$(_MAJOR)))
-	$(info VMK $@:$<)
-	>$(VMK) echo(# ${B2BT} version file
-	>>$(VMK) echo(${VER}BUILD=${BUILD}
-	>>$(VMK) echo(${VER}MINOR=${MINOR}
-	>>$(VMK) echo(${VER}MAJOR=${MAJOR}
+	$(eval MAJOR=$(call sh_lss,$(_MINOR),100,$($(VER)MAJOR),$(_MAJOR)))
+	>$(VMK) echo $(hash) $(CODIT_T) version file
+	>>$(VMK) echo ${VER}BUILD=${BUILD}
+	>>$(VMK) echo ${VER}MINOR=${MINOR}
+	>>$(VMK) echo ${VER}MAJOR=${MAJOR}
 
 # Codit specific installation instructions
 install: codit_install

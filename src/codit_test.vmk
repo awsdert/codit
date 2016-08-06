@@ -1,3 +1,4 @@
-test_BUILD=75 
-test_MINOR=0 
-test_MAJOR=0 
+# codit_test version file
+codit_test_BUILD=1
+codit_test_MINOR=0
+codit_test_MAJOR=0
