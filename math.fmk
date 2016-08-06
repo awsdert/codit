@@ -1,0 +1,72 @@
+CODIT_DIR?=
+include $(CODIT_DIR)build.mk
+
+sh_open_b=(
+sh_shut_b=)
+sh_read_file=more < "$(1)"
+sh_b_read_file=($(call sh_read_file,$(1)))
+
+ifneq ($(origin COMSPEC),'undefined')
+	sh_rm_f=del
+	sh_mkdir=mkdir
+	sh_var=%$(1)%
+	sh_let=set /a "$(1)=$(2)"
+	sh_addcmd=&
+	sh_get=set $(1)
+	_sh_eql=eql
+	_sh_neq=neq
+	_sh_gtr=gtr
+	_sh_geq=geq
+	_sh_lss=lss
+	_sh_leq=leq
+	sh_if=if ($(1)) ($(2))
+	sh_ifvar=$(call sh_if,%$(1)% $(2) %$(3)% ($(4)))
+	sh_else=else ($(1))
+	sh_endif=
+	sh_bool=if ($(1)) ($(2)) else ($(3))
+	sh_boolvar=if (%$(1)% $(2) %$(3)%) ($(4)) else ($(5))
+else
+	sh_rm_f=rm -f
+	sh_mkdir=mkdir
+	_sh_var=$
+	sh_var=$(_sh_var)$(1)
+	sh_let=let "$(1)=$(2)"
+	sh_addcmd=;
+	sh_get=echo $(_sh_var)$(1)
+	_sh_eql==
+	_sh_neq=!$(sh_eql)
+	_sh_gtr=>
+	_sh_geq=>$(sh_eql)
+	_sh_lss=<
+	_sh_leq=<$(sh_eql)
+	sh_if=if ($(1)); then ($(2))
+	sh_ifvar=if ($(_sh_var)$(1) $(2) $(_sh_var)$(3)); then ($(4))) fi
+	sh_else=else ($(1))
+	sh_endif=fi
+	sh_bool=if ($(1)); then ($(2)) else ($(3))
+	sh_boolvar=if ($(_sh_var)$(1) $(2) $(_sh_var)$(3)); then ($(4)) else ($(5)) fi
+endif
+
+# Echos name=result
+sh_echomath=$(shell $(call sh_let,tmp,$(1)) $(sh_addcmd) $(call sh_get,tmp))
+# $(call sh_math,expression)
+sh_math=$(subst  ,,$(subst tmp=,,$(call sh_echomath,$(1))))
+# $(call sh_cmp,num1,cmp_operater,num2,result_if_true,result_if_false)
+sh__cmp__set=$(call sh_let,tmp$(1),$(2)) $(sh_addcmd)
+sh__cmp_set=$(call sh__cmp__set,1,$(1)) $(call sh__cmp__set,2,$(2))
+sh__cmp_if=$(call sh_boolvar,tmp1,$(1),tmp2,echo $(2),echo $(3))
+sh__cmp_script=$(call sh__cmp_set,$(1),$(3)) $(call sh__cmp_if,$(2),$(4),$(5))
+sh_cmp=$(subst  ,,$(shell $(call sh__cmp_script,$(1),$(2),$(3),$(4),$(5))))
+# $(call sh_?,num1,num2,true,false)
+# num1 == num2
+sh_eql=$(call sh_cmp,$(1),$(_sh_eql),$(2),$(3),$(4))
+# num1 != num2
+sh_neq=$(call sh_cmp,$(1),$(_sh_neq),$(2),$(3),$(4))
+# num1 > num2
+sh_gtr=$(call sh_cmp,$(1),$(_sh_gtr),$(2),$(3),$(4))
+# num1 >= num2
+sh_geq=$(call sh_cmp,$(1),$(_sh_geq),$(2),$(3),$(4))
+# num1 < num2
+sh_lss=$(call sh_cmp,$(1),$(_sh_lss),$(2),$(3),$(4))
+# num1 <= num2
+sh_leq=$(call sh_cmp,$(1),$(_sh_leq),$(2),$(3),$(4))

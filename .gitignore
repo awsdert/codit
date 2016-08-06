@@ -31,3 +31,8 @@
 # Debug files
 *.dSYM/
 *.su
+
+# Directories
+3rdparty/
+bin/
+dbg/

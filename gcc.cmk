@@ -1,0 +1,122 @@
+# GCC Style Flags
+Fc=-c
+Fo=-o
+Fv=-v
+Fl=-l
+FD=-D
+FI=-I
+FL=-L
+FO=-O
+FMF=-MF
+FMP=-MP
+FO1=-O1
+FO2=-O2
+FO3=-O3
+FOs=-Os
+FOfast=-Ofast
+Fggdb=-ggdb
+FMMD=-MMD
+FWall=-Wall
+Fstd_c99=-std=c99
+FWerror=-Werror
+# Tools & Compiler Details
+define _GCC_GEN_DEP
+$(info $(1) $(5) -MM $(2) -MF $(3) -MT $(4))
+$($(if $(wildcard $(3)),shell $(RM) $(3),eval null))
+$(shell $(1) $(5) -MM $(2) -MF $(3) -MT $(4))
+endef
+
+ifeq ($(call defined,COMSPEC),1)
+
+# Default to chocolatey tools path
+TOOLS_DIR?=C:\tools\
+
+CYGWIN?=$(TOOLS_DIR)cygwin
+CYGWIN_PREFIX:=
+CYGWIN_SUB_DIR:=$(CYGWIN)
+CYGWIN_BIN_DIR?=$(CYGWIN)\bin
+CYGWIN_LIB_DIR:=$(CYGWIN_SUB_DIR)\lib
+CYGWIN_INC_DIR:=$(CYGWIN_SUB_DIR)\include
+CYGWIN_CC:="$(CYGWIN_BIN_DIR)\gcc.exe"
+CYGWIN_GEN_DEP=$(call _GCC_GEN_DEP,$(CYGWIN_CC),$(1),$(2),$(3),$(4))
+
+CLANG?=$(TOOLS_DIR)llvm
+CLANG_PREFIX:=
+CLANG_SUB_DIR:=$(CLANG)
+CLANG_BIN_DIR?=$(CLANG)\bin
+CLANG_LIB_DIR:=$(CLANG_SUB_DIR)\lib
+CLANG_INC_DIR:=$(CLANG_SUB_DIR)\include
+CLANG_CC:="$(CLANG_BIN_DIR)\gcc.exe"
+CLANG_GEN_DEP=$(call _GCC_GEN_DEP,$(CLANG_CC),$(1),$(2),$(3),$(4))
+
+MGW32?=$(TOOLS_DIR)mingw32
+MGW32_PREFIX:=mingw32
+MGW32_SUB_DIR:=$(MGW32)\$(MGW32_PREFIX)
+MGW32_BIN_DIR?=$(MGW32)\bin
+MGW32_LIB_DIR:=$(MGW32_SUB_DIR)\lib
+MGW32_INC_DIR:=$(MGW32_SUB_DIR)\include
+MGW32_CC:="$(MGW32_BIN_DIR)\$(MGW32_PREFIX)-gcc.exe"
+MGW32_GEN_DEP=$(call _GCC_GEN_DEP,$(MGW32_CC),$(1),$(2),$(3),$(4))
+
+# Default directory used here is the one compatible with chocolately
+MGW64:=$(TOOLS_DIR)mingw64
+MGW64_PREFIX:=x86_64-w64-mingw32
+MGW64_SUB_DIR:=$(MGW64)\$(MGW64_PREFIX)
+MGW64_BIN_DIR:=$(MGW64)\bin
+MGW64_LIB_DIR:=$(MGW64_SUB_DIR)\lib $(MGW64_DIR)\lib
+MGW64_INC_DIR:=$(MGW64_SUB_DIR)\include $(MGW64_DIR)\include
+MGW64_CC:="$(MGW64_BIN_DIR)\$(MGW64_PREFIX)-gcc.exe"
+MGW64_GEN_DEP=$(call _GCC_GEN_DEP,$(MGW64_CC),$(1),$(2),$(3),$(4))
+
+else
+
+CYGWIN?=$(TOOLS_DIR)cygwin
+CYGWIN_PREFIX:=
+CYGWIN_SUB_DIR:=$(CYGWIN)
+CYGWIN_BIN_DIR?=$(CYGWIN)/bin
+CYGWIN_LIB_DIR:=$(CYGWIN_SUB_DIR)/lib
+CYGWIN_INC_DIR:=$(CYGWIN_SUB_DIR)/include
+CYGWIN_CC:="$(CYGWIN_BIN_DIR)/gcc.exe"
+CYGWIN_GEN_DEP=$(call _GCC_GEN_DEP,$(CYGWIN_CC),$(1),$(2),$(3),$(4))
+
+CLANG?=$(TOOLS_DIR)llvm
+CLANG_PREFIX:=
+CLANG_SUB_DIR:=$(CLANG)
+CLANG_BIN_DIR?=$(CLANG)/bin
+CLANG_LIB_DIR:=$(CLANG_SUB_DIR)/lib
+CLANG_INC_DIR:=$(CLANG_SUB_DIR)/include
+CLANG_CC:="$(CLANG_BIN_DIR)/gcc.exe"
+CLANG_GEN_DEP=$(call _GCC_GEN_DEP,$(CLANG_CC),$(1),$(2),$(3),$(4))
+
+MGW32?=$(TOOLS_DIR)mingw32
+MGW32_PREFIX:=mingw32
+MGW32_SUB_DIR:=$(MGW32)/$(MGW32_PREFIX)
+MGW32_BIN_DIR?=$(MGW32)/bin
+MGW32_LIB_DIR:=$(MGW32_SUB_DIR)/lib
+MGW32_INC_DIR:=$(MGW32_SUB_DIR)/include
+MGW32_CC:="$(MGW32_BIN_DIR)/$(MGW32_PREFIX)-gcc.exe"
+MGW32_GEN_DEP=$(call _GCC_GEN_DEP,$(MGW32_CC),$(1),$(2),$(3),$(4))
+
+# Default directory used here is the one compatible with chocolately
+MGW64:=$(TOOLS_DIR)mingw64
+MGW64_PREFIX:=x86_64-w64-mingw32
+MGW64_SUB_DIR:=$(MGW64)/$(MGW64_PREFIX)
+MGW64_BIN_DIR:=$(MGW64)/bin
+MGW64_LIB_DIR:=$(MGW64_SUB_DIR)/lib $(MGW64_DIR)/lib
+MGW64_INC_DIR:=$(MGW64_SUB_DIR)/include $(MGW64_DIR)/include
+MGW64_CC:="$(MGW64_BIN_DIR)/$(MGW64_PREFIX)-gcc.exe"
+MGW64_GEN_DEP=$(call _GCC_GEN_DEP,$(MGW64_CC),$(1),$(2),$(3),$(4))
+
+endif
+
+CYGWIN_IFLAGS:=$(FI)"$(CYGWIN_INC_DIR)"
+CYGWIN_LFLAGS:=$(FL)"$(CYGWIN_LIB_DIR)"
+
+CLANG_IFLAGS:=$(FI)"$(CLANG_INC_DIR)"
+CLANG_LFLAGS:=$(FL)"$(CLANG_LIB_DIR)"
+
+MGW32_IFLAGS:=$(FI)"$(MGW32_INC_DIR)"
+MGW32_LFLAGS:=$(FL)"$(MGW32_LIB_DIR)"
+
+MGW64_IFLAGS:=$(FI)"$(MGW64_INC_DIR)"
+MGW64_LFLAGS:=$(FL)"$(MGW64_LIB_DIR)"

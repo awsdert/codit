@@ -3,8 +3,12 @@
 	"editor.rulers": [80],
 	"editor.insertSpaces": false,
 	"editor.renderWhitespace": true,
+	"editor.folding": true,
 	"files.associations": {
+		"*.d" : "makefile",
 		"*.mk" : "makefile",
-		"*.vmk" : "makefile"
+		"*.vmk" : "makefile",
+		"*.fmk" : "makefile",
+		"*.cmk" : "makefile"
 	}
 }

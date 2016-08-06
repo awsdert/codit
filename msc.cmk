@@ -1,0 +1,63 @@
+# GCC style flags
+Fc=/c
+Fo=/OUT
+Fl=/l
+FD=/D
+FI=/I
+FL=/L
+FO1=/O1
+FO2=/O2
+FW1=/W1
+FW2=/W2
+FW3=/W3
+FWall=/Wall
+Fstd_c99=/TP
+
+ifeq ($(call defined,COMSPEC),1)
+
+ifeq ($(call defined,ProgramW6432),1)
+PROGRAMFILES32:=$(PROGRAMFILES)
+PROGRAMFILES64:=
+else
+PROGRAMFILES32:=${ProgramFiles(x86)}
+PROGRAMFILES64:=${ProgramFiles}
+endif
+
+VS2015?=$(PROGRAMFILES32)\Microsoft Visual Studio 14.0
+MSC=$(VS2015)\VC
+MSC_INC_DIR=$(MSC)\include
+MSC_LIB_DIR=$(MSC)\lib
+MSC_BIN_DIR=$(MSC)\bin
+MSC_CC=$(MSC_BIN_DIR)\cl.exe /nologo
+MSC_LNK=$(MSC_BIN_DIR)\link.exe /nologo
+
+WDK_DIR:=$(PROGRAMFILES)Windows Kit
+WDK_SUB_DIR:=$(WDK_DIR)\8.1
+WDK_INC_DIR:=$(WDK_SUB_DIR)\include
+
+# The 1st \ is treated as an escape character
+MSC_IFLAGS:=$(subst \,\\,$(FI)"$(MSC_INC_DIR)" $(FI)"$(WDK_INC_DIR)")
+MSC_LFLAGS:=$(subst \,\\,$(FL)"$(MSC_LIB_DIR)" $(FL)"$(WDK_LIB_DIR)")
+
+else
+
+$(error msc.cmk should NOT be included in non-windows OS)
+
+MSC_CC=
+MSC_INC_DIR=
+MSC_LIB_DIR=
+
+MSC_IFLAGS=
+MSC_LFLAGS=
+
+endif
+
+# Error indicated by syntax highlight, this is a workaround
+MSC_OPEN_B=(
+MSC_SHUT_B=)
+define MSC_GEN_DEP
+	$(shell for /F "tokens=1,2,3,*" %%A in $(MSC_OPEN_B)\
+	"cl.exe /nologo /c $(1) /Zs /showIncludes /I$(2)"$(MSC_SHUT_B) do\
+	$(MSC_OPEN_B)if not "%%D"=="" set codit_line=%codit_line% %%D$(MSC_SHUT_B)\
+	>$(2) echo $(1):%codit_line%)
+endef
