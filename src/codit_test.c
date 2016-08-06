@@ -1,4 +1,4 @@
-#include <Codit-Proclst.h>
+#include <Codit-ProcLst.h>
 #include <stdio.h>
 
 unsigned short	VERSION_MAJOR = MK_VERSION_MAJOR;

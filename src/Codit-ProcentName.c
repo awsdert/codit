@@ -1,4 +1,4 @@
-#include <Codit-Proclst.h>
+#include <Codit-ProcLst.h>
 BOOL CoditProceentName( PAGES pages, PPROCENT ppe, char **name, int *leng )
 {
 	if ( !ppe || !name || !leng )

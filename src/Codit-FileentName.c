@@ -1,4 +1,4 @@
-#include <Codit-Filelst.h>
+#include <Codit-FileLst.h>
 
 BOOL CoditFileentName( PFILEENT pfe, char **name, int *leng )
 {

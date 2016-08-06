@@ -32,6 +32,9 @@
 *.dSYM/
 *.su
 
+# Specific Files
+dependencies.mk
+
 # Directories
 3rdparty/
 bin/

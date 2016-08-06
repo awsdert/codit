@@ -1,4 +1,4 @@
-#include <Codit-Procobj.h>
+#include <Codit-ProcObj.h>
 uint64_t CoditProcobjSet( HPROCOBJ hpo,
 	uintptr_t addr,
 	void const *buff,

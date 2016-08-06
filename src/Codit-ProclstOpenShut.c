@@ -1,4 +1,4 @@
-#include <Codit-Proclst.h>
+#include <Codit-ProcLst.h>
 #ifdef _WIN32
 HPROCLST CoditProclstOpen( int ppid )
 {

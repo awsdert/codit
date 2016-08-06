@@ -1,4 +1,4 @@
-#include <Codit-Procobj.h>
+#include <Codit-ProcObj.h>
 
 HPROCOBJ CoditProcobjRun( char *path, char *options )
 {

@@ -50,9 +50,11 @@ sh_mkdir=$(foreach $(0)_DIR,$(1),$(call _mkdir,$($(0)_DIR)))
 
 $(eval $(call sh_mkdir,$(CODIT_ALL_DIRECTORIES)))
 
-vpath codit*.c $(CODIT_SRC_DIR)
-vpath codit*.cpp $(CODIT_SRC_DIR)
-vpath codit*.h $(CODIT_INC_DIR)
-vpath codit*.d $(CODIT_T_DEP_DIR)
-vpath codit*.o $(CODIT_T_OBJ_DIR)
-vpath codit*.out $(CODIT_T_OUT_DIR)
+define CODIT_VPATHS
+$(CODIT_SRC_DIR)\
+$(CODIT_INC_DIR)\
+$(CODIT_T_OBJ_DIR)\
+$(CODIT_T_OUT_DIR)
+endef
+VPATHS?=
+VPATHS+= $(CODIT_VPATHS)

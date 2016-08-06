@@ -129,10 +129,9 @@ endef
 
 $(shell >$(DEP_FILE) echo $(hash) DO NOT MODIFY! Generated on the fly)
 $(foreach src,$(CODIT_SRC),$(call PRINT_INC,$(CODIT__SRC_DIR)$(src),$(patsubst %.c,%.o,$(src))))
-$(eval PRINT_INCLUDES:=$(filter Codit%,$(sort $(PRINT_INCLUDES))))
+$(eval PRINT_INCLUDES:=$(sort $(PRINT_INCLUDES)))
+$(eval PRINT_INCLUDES:=$(filter Codit%,$(PRINT_INCLUDES)) $(filter codit%,$(PRINT_INCLUDES)))
 $(foreach header,$(PRINT_INCLUDES),$(shell >>$(DEP_FILE) echo $(header)$(colon)))
-#$(info $(hash) Begin compiling dependencies)
-#$(eval $(foreach codit_d,$(CODIT_DEP),$(call CODIT_GEN_DEP,$(codit_d),.c)))
 include $(DEP_FILE)
 
 main: codit_main
@@ -155,45 +154,20 @@ codit_test_out:=$(TARGET_BIN_EXT)
 codit_test.o: Codit-ProcLst.h
 codit_test.out codit_test.vmk: CODIT_T=codit_test
 
-$(CODIT_OUT): LFLAGS=$($(CODIT_T)_LFLAGS)
-$(CODIT_OUT): OBJ=$($(CODIT_T)_o)
-$(CODIT_OUT): %.out : %.vmk directories $(OBJ)
+$(CODIT_OUT): %.out: %.vmk directories $($(CODIT_T)_o)
 	$(eval PATH=$(CC_PATH))
-	$(eval DOT_OUT=$(CODIT__OUT_DIR)$@
-	$(eval BIN_OUT=$(subst .out,$($(CODIT_T)_out),$(DOT_OUT))))
-	$(CC) $(LFLAGS) $(Fo) $(DOT_OUT) $(OBJ)
+	$(eval DOT_OUT=$(CODIT__OUT_DIR)$@)
+	$(eval BIN_OUT=$(subst .out,$($(CODIT_T)_out),$(DOT_OUT)))
+	$(info OUT $@:$<)
+	$(CC) $($(CODIT_T)_LFLAGS) $(Fo) $(DOT_OUT) $($(CODIT_T)_o)
 	copy $(DOT_OUT) $(BIN_OUT)
 
-# Codit specific installation instructions
-install: codit_install
-ifeq ($(CODIT_MSW),1)
-# XP users need to install this:
-# https://www.microsoft.com/en-us/download/details.aspx?id=17657
-codit_install:
-	robocopy $(CODIT_T_OUT_DIR)/* $(PROGRAMFILES)Codit /e /i
-else
-codit_install:
-	-m 0755 codit /usr/local/bin
-	-m 0644 *.png /share/codit/icons
-endif
-
 # General linker files
-Codit-FileObj.h: Codit-Fault.h
-Codit-FileLst.h: Codit-FileObj.h
-Codit-ProcObj.h: Codit-FileLst.h
-Codit-ProcLst.h: Codit-ProcObj.h
-Codit-Basic%.o: CoditFault.h
-Codit-FileObj%.o: CoditFileObj.h
-Codit-FileLst%.o CoditFileent%.o: CoditFileLst.h
-Codit-ProcObj%.o: CoditProcObj.h
-Codit-ProcLst%.o CoditProcent%.o: CoditProcLst.h
-$(CODIT_OBJ): LFLAGS=$($(CODIT_T)_LFLAGS)
-$(CODIT_OBJ): CFLAGS=$($(CODIT_T)_CFLAGS)
 $(CODIT_OBJ): %.o: $(CODIT__SRC_DIR)%.c
-	$(eval SRC=$<)
-	$(eval OBJ=$(CODIT__OBJ_DIR)$@)
 	$(eval PATH=$(CC_PATH))
-	$(CC) $(CFLAGS) $(LFLAGS) $(Fo) $(OBJ) $(Fc) $(SRC)
+	$(info OBJ $@: $<)
+	$(CC) $($(CODIT_T)_CFLAGS) $($(CODIT_T)_LFLAGS)\
+	$(Fo) $(CODIT_T_OBJ_DIR)$@ $(Fc) $<
 
 $(CODIT_VMK): $($(CODIT_T)_c)
 	$(eval VMK=$(CODIT__SRC_DIR)$@)
@@ -208,7 +182,21 @@ $(CODIT_VMK): $($(CODIT_T)_c)
 	$(eval BUILD=$(call sh_lss,$(_BUILD),10000,$(_BUILD),0))
 	$(eval MINOR=$(call sh_lss,$(_MINOR),100,$(_MINOR),0))
 	$(eval MAJOR=$(call sh_lss,$(_MINOR),100,$(PRVMAJOR),$(_MAJOR)))
+	$(info VMK $@:$<)
 	>$(VMK) echo(# ${B2BT} version file
 	>>$(VMK) echo(${VER}BUILD=${BUILD}
 	>>$(VMK) echo(${VER}MINOR=${MINOR}
 	>>$(VMK) echo(${VER}MAJOR=${MAJOR}
+
+# Codit specific installation instructions
+install: codit_install
+ifeq ($(CODIT_MSW),1)
+# XP users need to install this:
+# https://www.microsoft.com/en-us/download/details.aspx?id=17657
+codit_install:
+	robocopy $(CODIT_T_OUT_DIR)/* $(PROGRAMFILES)Codit /e /i
+else
+codit_install:
+	-m 0755 codit /usr/local/bin
+	-m 0644 *.png /share/codit/icons
+endif
