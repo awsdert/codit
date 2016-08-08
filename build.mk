@@ -45,6 +45,9 @@ ifeq ($(UNAME_S),Windows)
 SHELL:=cmd.exe
 RM=del
 HOST_MSW=1
+HOST_EXE_SUFFIX:=.exe
+HOST_DLL_PREFIX:=
+HOST_DLL_SUFFIX:=.dll
 HOST_SYS_DEF:=_WIN
 HOST_SYS_DIR:=windows
 HOST_DIR_SEP:=$(word 1,\)
@@ -55,6 +58,9 @@ ifeq ($(UNAME_S),Windows_NT)
 SHELL:=cmd.exe
 RM=del
 HOST_MSW=1
+HOST_EXE_SUFFIX:=.exe
+HOST_DLL_PREFIX:=
+HOST_DLL_SUFFIX:=.dll
 HOST_SYS_DEF:=_WIN
 HOST_SYS_DIR:=windows
 HOST_DIR_SEP:=$(word 1,\)
@@ -62,6 +68,9 @@ else
 SHELL:=/bin/sh
 RM=rm -f
 HOST_MSW=0
+HOST_EXE_SUFFIX:=
+HOST_DLL_PREFIX:=lib
+HOST_DLL_SUFFIX:=.so
 HOST_SYS_DEF?=__linux__
 HOST_SYS_DIR?=linux
 HOST_DIR_SEP:=/

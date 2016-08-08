@@ -1,7 +1,9 @@
 #pragma once
 #include "Codit-Fault.h"
 #include <stdint.h>
+
 #ifdef _WIN32
+#include <windows.h>
 typedef HANDLE HFILEOBJ;
 typedef SECURITY_ATTRIBUTES OSSAFETY;
 #define FILEOBJ_RECREATE	CREATE_ALWAYS

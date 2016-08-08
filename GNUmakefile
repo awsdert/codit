@@ -9,24 +9,24 @@ include $(CODIT_DIR)build.mk
 include $(CODIT_DIR)paths.mk
 include $(CODIT_DIR)math.fmk
 
-ifeq ("$(TARGET_SYS_DIR)","win32")
-CODIT_T_CFLAGS.c=$(FD)_WIN32
-CODIT_T_LFLAGS.c=$(Fl)kernerl32 $(Fl)shell32
-endif
+CODIT_T_CFLAGS.c=$(CC_CFLAGS) $(FI)"$(CODIT_INC_DIR)"
+CODIT_T_LFLAGS.c=$(CC_LFLAGS)
 
-ifeq ("$(TARGET_SYS_DIR)","win64")
-CODIT_T_CFLAGS.c=$(FD)_WIN64 $(FD)_WIN32
-CODIT_T_LFLAGS.c=$(Fl)kernerl32 $(Fl)shell32
+ifeq ("$(TARGET_SYS_DIR)","windows")
+ifeq ("$(TARGET_SYS_DIR)","windows")
+CODIT_T_CFLAGS.c+= $(FD)_WIN64
+endif
+CODIT_T_CFLAGS.c+= $(FD)_WIN32
+CODIT_T_LFLAGS.c+= $(Fl)kernerl32 $(Fl)shell32
 endif
 
 ifeq ("$(TARGET_SYS_DIR)","linux")
-CODIT_T_CFLAGS.c=$(FD)__linux__
-CODIT_T_LFLAGS.c=
+CODIT_T_CFLAGS.c+= $(FD)__linux__
 endif
 
 CODIT_SRC:=$(sort $(notdir $(wildcard $(CODIT__SRC_DIR)*.c)))
-CODIT_OBJ:=$(CODIT_SRC %.c,%.o)
-CODIT_DEP:=$(CODIT_SRC %.c,%.d)
+CODIT_OBJ:=$(CODIT_SRC:.c=.o)
+CODIT_DEP:=$(CODIT_SRC:.c=.d)
 CODIT_OUT:=$(addprefix codit_,$(CODIT_TARGETS:=.out))
 CODIT_VMK:=$(CODIT_OUT:.out=.vmk)
 
@@ -133,42 +133,72 @@ $(eval PRINT_INCLUDES:=$(sort $(PRINT_INCLUDES)))
 $(foreach header,$(PRINT_INCLUDES),$(shell >>$(DEP_FILE) echo $(header)$(colon)))
 include $(DEP_FILE)
 
+core: codit_core.out
+include $(CODIT__SRC_DIR)codit_core.vmk
+codit_core_CFLAGS:=$(CODIT_T_CFLAGS.c)
+codit_core_CFLAGS+= $(FD)CODIT_CORE_MAJOR=$(codit_core_MAJOR)
+codit_core_CFLAGS+= $(FD)CODIT_CORE_MINOR=$(codit_core_MINOR)
+codit_core_CFLAGS+= $(FD)CODIT_CORE_BUILD=$(codit_core_BUILD)
+codit_core_LFLAGS:=$(CODIT_T_LFLAGS.c)
+codit_core_c:=$(wildcard $(CODIT__SRC_DIR)*-*.c) $(CODIT__SRC_DIR)codit_core.c
+codit_core_o:=$(notdir $(codit_core_c:.c=.o))
+codit_core_3rdparty:=$(FD)CODIT_CORE_EXPORT
+codit_core_prefix:=$(TARGET_DLL_PREFIX)
+codit_core_suffix:=$(TARGET_DLL_SUFFIX)
+codit_core.out codit_core.vmk: $(eval CODIT_T=codit_core)
+
 main: codit_main.out
 include $(CODIT__SRC_DIR)codit_main.vmk
-codit_main_CFLAGS:=$(CODIT_T_CFLAGS)
-codit_main_LFLAGS:=$(CODIT_T_LFLAGS)
+codit_main_CFLAGS:=$(codit_core_CFLAGS)
+codit_main_CFLAGS+= $(FD)CODIT_MAIN_MAJOR=$(codit_main_MAJOR)
+codit_main_CFLAGS+= $(FD)CODIT_MAIN_MINOR=$(codit_main_MINOR)
+codit_main_CFLAGS+= $(FD)CODIT_MAIN_BUILD=$(codit_main_BUILD)
+codit_main_LFLAGS:=$(CODIT_T_LFLAGS.c)
 codit_main_c:=$(wildcard $(CODIT__SRC_DIR)*-*.c) $(CODIT__SRC_DIR)codit_main.c
-codit_main_o:=$(codit_main_c:=.c=.o)
-codit_main_out:=$(TARGET_BIN_EXT)
-codit_main.out codit_main.vmk: CODIT_T=codit_main
+codit_main_o:=$(notdir $(codit_main_c:.c=.o))
+codit_main_3rdparty:=
+codit_main_prefix:=
+codit_main_suffix:=$(TARGET_EXE_SUFFIX)
+codit_main.out: codit_core.out
+codit_main.out codit_main.vmk: $(eval CODIT_T=codit_main)
 
 test: codit_test.out
 include $(CODIT__SRC_DIR)codit_test.vmk
-codit_test_CFLAGS:=$(CODIT_T_CFLAGS)
-codit_test_LFLAGS:=$(CODIT_T_LFLAGS)
+codit_test_CFLAGS:=$(codit_core_CFLAGS)
+codit_test_CFLAGS+= $(FD)CODIT_TEST_MAJOR=$(codit_test_MAJOR)
+codit_test_CFLAGS+= $(FD)CODIT_TEST_MINOR=$(codit_test_MINOR)
+codit_test_CFLAGS+= $(FD)CODIT_TEST_BUILD=$(codit_test_BUILD)
+codit_test_LFLAGS:=$(CODIT_T_LFLAGS.c)
 codit_test_c:=$(wildcard $(CODIT__SRC_DIR)*-*.c) $(CODIT__SRC_DIR)codit_test.c
-codit_test_o:=$(codit_test_c:=.c=.o)
-codit_test_out:=$(TARGET_BIN_EXT)
-codit_test.out codit_test.vmk: CODIT_T=codit_test
+codit_test_o:=$(notdir $(codit_test_c:.c=.o))
+codit_test_3rdparty:=
+codit_test_prefix:=
+codit_test_suffix:=$(TARGET_EXE_SUFFIX)
+codit_test.out: codit_core.out
+codit_test.out codit_test.vmk: $(eval CODIT_T=codit_test)
 
 export PATH=$(CC_PATH)
 
 $(CODIT_OUT): $(eval OBJECTS=$($(CODIT_T)_o))
 $(CODIT_OUT): %.out: %.vmk $(OBJECTS)
-	$(eval DOT_OUT=$(CODIT_T_OUT_DIR)/$@)
-	$(eval BIN_OUT=$(subst .out,$($(CODIT_T)_out),$(DOT_OUT)))
-	$(info OUT $@: $(BIN_OUT): $<)
-	$(CC) $($(CODIT_T)_LFLAGS) $(Fo) $(DOT_OUT) $(OBJECTS)
-	copy $(DOT_OUT) $(BIN_OUT)
+	$(eval PREFIX=$($(CODIT_T)_prefix))
+	$(eval SUFFIX=$($(CODIT_T)_suffix))
+	$(eval OUTPUT=$(CODIT_T_OUT_DIR)/$(PREFIX)$(CODIT_T)$(SUFFIX))
+	$(eval SOURCE=$(addprefix $(CODIT_T_OBJ_DIR),$(OBJECTS)))
+	$(eval LFLAGS=$($(CODIT_T)_LFLAGS))
+	$(CC) $(LFLAGS) $(SOURCE) $(Fo) $(OUTPUT)
 
 # General linker files
 $(CODIT_OBJ): %.o: $(CODIT__SRC_DIR)%.c
 	$(info OBJ $@: $<)
-	$(CC) $($(CODIT_T)_CFLAGS) $($(CODIT_T)_LFLAGS)\
-	$(Fo) $(CODIT_T_OBJ_DIR)$@ $(Fc) $<
+	$(eval OUTPUT=$(CODIT_T_OBJ_DIR)/$@)
+	$(eval SOURCE=$<)
+	$(eval CFLAGS=$($(CODIT_T)_3rdparty) $($(CODIT_T)_CFLAGS))
+	$(eval LFLAGS=$($(CODIT_T)_LFLAGS))
+	$(CC) $(CFLAGS) $(LFLAGS) $(SOURCE) $(Fo) $(OUTPUT)
 
 $(CODIT_VMK): $($(CODIT_T)_c)
-	$(eval VMK=$(CODIT__SRC_DIR)$@)
+	$(eval OUTPUT=$(CODIT__SRC_DIR)$@)
 	$(eval VER=$(CODIT_T)_)
 	$(eval _BUILD=$(call sh_math,+1))
 	$(eval __MINOR=$(call sh_math,$($(VER)BUILD)+1))
@@ -177,10 +207,10 @@ $(CODIT_VMK): $($(CODIT_T)_c)
 	$(eval BUILD=$(call sh_lss,$(_BUILD),10000,$(_BUILD),0))
 	$(eval MINOR=$(call sh_lss,$(_MINOR),100,$(_MINOR),0))
 	$(eval MAJOR=$(call sh_lss,$(_MINOR),100,$($(VER)MAJOR),$(_MAJOR)))
-	>$(VMK) echo $(hash) $(CODIT_T) version file
-	>>$(VMK) echo ${VER}BUILD=${BUILD}
-	>>$(VMK) echo ${VER}MINOR=${MINOR}
-	>>$(VMK) echo ${VER}MAJOR=${MAJOR}
+	>$(OUTPUT) echo $(hash) $(CODIT_T) version file
+	>>$(OUTPUT) echo ${VER}BUILD=${BUILD}
+	>>$(OUTPUT) echo ${VER}MINOR=${MINOR}
+	>>$(OUTPUT) echo ${VER}MAJOR=${MAJOR}
 
 # Codit specific installation instructions
 install: codit_install

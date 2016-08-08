@@ -21,12 +21,9 @@ CODIT_DIR:=$(TOP_DIR)
 # We give a default here based on the system hosting the chosen compiler
 include $(CODIT_DIR)build.mk
 TARGET_ARCH?=x86
-ifndef TARGET_SYS_BIT
-TARGET_SYS_BIT:=$(HOST_SYS_BIT)
-endif
-ifndef TARGET_SYS_DIR
-TARGET_SYS_DIR:=$(HOST_SYS_DIR)
-endif
+TARGET_SYS_BIT?=$(HOST_SYS_BIT)
+TARGET_SYS_DIR?=$(HOST_SYS_DIR)
+TARGET_EXE_SUFFIX?=$(HOST_EXE_SUFFIX)
 # Optional: Default directories are assumed if not defined
 CODIT_INC_DIR:=$(CODIT_DIR)include
 CODIT_SRC_DIR:=$(CODIT_DIR)src
@@ -52,15 +49,10 @@ CC_BIN_DIR:=$($(CC_PREFIX)_BIN_DIR)
 CC_LIB_DIR:=$($(CC_PREFIX)_LIB_DIR)
 CC_INC_DIR:=$($(CC_PREFIX)_INC_DIR)
 CC_PATH:=$(CC_BIN_DIR);$(CC_LIB_DIR);$(PATH)
-CC_IFLAGS:=$(FI)"$(CC_INC_DIR)"
-CC_LFLAGS:=$(FL)"$(CC_LIB_DIR)"
-CC_CFLAGS:=$(FWall) $(FWerror)
-CC:=$($(CC_PREFIX)_CC)
-# $(call CC_GEN_DEP,$(SRC),$(DEP),$(OBJ),$(CFLAGS))
-define CC_GEN_DEP
-	#(info $(0)=$(CC_PREFIX)_GEN_DEP,$(1),$(2),$(3),$(4))
-	$(call $(CC_PREFIX)_GEN_DEP,$(1),$(2),$(3),$(4))
-endef
+CC_LFLAGS:=$(subst \,\\,$(addsuffix ",$(addprefix $(FL)",$(CC_LIB_DIR))))
+CC_CFLAGS:=$(subst \,\\,$(addsuffix ",$(addprefix $(FL)",$(CC_INC_DIR))))
+CC_CFLAGS+=$(FWall) $(FWerror)
+CC:="$(subst \,\\,$($(CC_PREFIX)_CC))"
 
 # Required: Needed for wildcards
 VPATHS=$(CC_VPATHS) $(TOP_DIR)

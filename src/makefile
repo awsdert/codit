@@ -1,2 +1,2 @@
 TOP_DIR=../
-include $(TOPDIR)makefile
+include $(TOP_DIR)makefile

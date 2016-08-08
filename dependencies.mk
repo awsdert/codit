@@ -5,6 +5,8 @@ Codit-BasicMem.o: Codit-Fault.h Codit-Basic.h
 Codit-BasicPage.o: Codit-Fault.h Codit-Basic.h
 # State src/Codit-BasicStr.c dependencies
 Codit-BasicStr.o: Codit-Fault.h Codit-Basic.h
+# State src/Codit-Build.c dependencies
+Codit-Build.o: Codit-Build.h
 # State src/Codit-FileentName.c dependencies
 Codit-FileentName.o: Codit-FileLst.h
 # State src/Codit-FilelstNxt.c dependencies
@@ -35,11 +37,14 @@ Codit-ProcobjPutGet.o: Codit-ProcObj.h
 Codit-ProcobjRun.o: Codit-ProcObj.h
 # State src/codit-ProcentStatus.c dependencies
 codit-ProcentStatus.o: Codit-ProcLst.h
+# State src/codit_core.c dependencies
+codit_core.o: Codit-ProcLst.h
 # State src/codit_main.c dependencies
 codit_main.o: Codit-ProcLst.h
 # State src/codit_test.c dependencies
 codit_test.o: Codit-ProcLst.h
 Codit-Basic.h:
+Codit-Build.h:
 Codit-Fault.h:
 Codit-FileLst.h:
 Codit-FileObj.h:
