@@ -17,7 +17,7 @@ ifeq ("$(TARGET_SYS_DIR)","windows")
 CODIT_T_CFLAGS.c+= $(FD)_WIN64
 endif
 CODIT_T_CFLAGS.c+= $(FD)_WIN32
-CODIT_T_LFLAGS.c+= $(Fl)kernerl32 $(Fl)shell32
+CODIT_T_LFLAGS.c+= $(Fl)kernel32 $(Fl)shell32
 endif
 
 ifeq ("$(TARGET_SYS_DIR)","linux")
