@@ -36,6 +36,10 @@
 dependencies.mk
 
 # Directories
+.vscode/
 3rdparty/
 bin/
 dbg/
+
+# Unignore certain files
+!.vscode/settings.json
